@@ -5,36 +5,87 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Regelungstechnik</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
 </head>
+
 <body>
     <h1>Learning Control Systems Engineering with Interactive Visualization.</h1>
     <div class="control_loop">
-        <div class="control_loop_element" id="input_variable">
-            <b class="element_description">Sollwert</b>
-            <button class="expand_button">+</button>
-            <button class="information_button">i</button>
+        <div class="control_loop_plots">
+            <svg class="control_loop_plot" id="input_plot"></svg>
+            <svg class="control_loop_plot" id="control_plot"></svg>
+            <svg class="control_loop_plot" id="output_plot"></svg>
         </div>
-        <div class="control_loop_element" id="controller">
-            <b class="element_description">Regler</b>
-            <button class="expand_button">+</button>
-            <button class="information_button">i</button>
+        <div class="control_loop_top_row">
+            <div class="control_loop_element" id="input_variable">
+                <div class="control_loop_element_top_row">
+                    <b class="element_description">Sollwert</b>
+                    <button class="expand_button">+</button>
+                    <button class="information_button">i</button>
+                </div>
+                <div class="control_loop_element_bottom_row">
+                    <b>bottom row</b>
+                </div>
+            </div>
+            <div class="control_loop_element" id="controller">
+                <div class="control_loop_element_top_row">
+                    <b class="element_description">Regler</b>
+                    <button class="expand_button">+</button>
+                    <button class="information_button">i</button>
+                </div>
+                <div class="control_loop_element_bottom_row">
+                    <b>bottom row</b>
+                </div>
+            </div>
+            <div class="control_loop_element" id="controlled_system">
+                <div class="control_loop_element_top_row">
+                    <b class="element_description">Regelstrecke</b>
+                    <button class="expand_button">+</button>
+                    <button class="information_button">i</button>
+                </div>
+                <div class="control_loop_element_bottom_row">
+                    <b>bottom row</b>
+                </div>
+            </div>
+            <div class="control_loop_element" id="output_variable">
+                <div class="control_loop_element_top_row">
+                    <b class="element_description">Regelgröße</b>
+                    <button class="expand_button">+</button>
+                    <button class="information_button">i</button>
+                </div>
+                <div class="control_loop_element_bottom_row">
+                    <b>bottom row</b>
+                </div>
+            </div>
         </div>
-        <div class="control_loop_element" id="measuring_element">
-            <b class="element_description">Messglied</b>
-            <button class="expand_button">+</button>
-            <button class="information_button">i</button>
-        </div>
-        <div class="control_loop_element" id="controlled_system">
-            <b class="element_description">Regelstrecke</b>
-            <button class="expand_button">+</button>
-            <button class="information_button">i</button>
-        </div>
-        <div class="control_loop_element" id="output_variable">
-            <b class="element_description">Regelgröße</b>
-            <button class="expand_button">+</button>
-            <button class="information_button">i</button>
+        <div class="control_loop_bottom_row">
+            <div class="control_loop_element" id="measuring_element">
+                <div class="control_loop_element_top_row">
+                    <b class="element_description">Messglied</b>
+                    <button class="expand_button">+</button>
+                    <button class="information_button">i</button>
+                </div>
+                <div class="control_loop_element_bottom_row">
+                    <b>bottom row</b>
+                </div>
+            </div>
         </div>
     </div>   
 </body>
+
+
+<script
+    src="https://code.jquery.com/jquery-3.6.0.min.js"
+    integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+    crossorigin="anonymous">
+</script>
+<script 
+    src="https://d3js.org/d3.v6.min.js">
+</script>
+<script 
+    src="js/functions.js">
+</script>
+
 </html>

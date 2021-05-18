@@ -10,13 +10,26 @@
     <link rel="stylesheet" href="css/styles.css">
 </head>
 
+<svg class="background_svg_draw_area" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" />
+        </marker>
+    </defs>
+    <line id="line_input_to_controller"></line>
+    <line id="line_controller_to_system"></line>
+    <line id="line_system_to_output"></line>
+    <path id="line_to_measurement"></path>
+    <path id="line_from_measurement"></path>
+</svg>
+
 <body>
-    <h1>Learning Control Systems Engineering with Interactive Visualization.</h1>
+    <h1>Learning Control Systems Engineering with Interactive Visualization</h1>
     <div class="control_loop">
         <div class="control_loop_plots">
-            <svg class="control_loop_plot" id="input_plot"></svg>
-            <svg class="control_loop_plot" id="control_plot"></svg>
-            <svg class="control_loop_plot" id="output_plot"></svg>
+            <div class="control_loop_plot" id="input_plot"></div>
+            <div class="control_loop_plot" id="control_plot"></div>
+            <div class="control_loop_plot" id="output_plot"></div>
         </div>
         <div class="control_loop_top_row">
             <div class="control_loop_element" id="input_variable">
@@ -26,7 +39,12 @@
                     <button class="information_button">i</button>
                 </div>
                 <div class="control_loop_element_bottom_row">
-                    <b>bottom row</b>
+                    <div class="element_value">
+                        <b>Sprung</b>
+                    </div>
+                    <div class="element_visualisation">
+                        <b>_|'</b>
+                    </div>
                 </div>
             </div>
             <div class="control_loop_element" id="controller">
@@ -36,7 +54,28 @@
                     <button class="information_button">i</button>
                 </div>
                 <div class="control_loop_element_bottom_row">
-                    <b>bottom row</b>
+                    <div class="element_value">
+                        <b>PID</b>
+                    </div>
+                    <div class="element_visualisation">
+                        <div class="range_slider_box" id="controller_range_slider_box">
+                            <div class="range_slider">
+                                <input type="range" id="range_k" name="range_k"
+                                        min="0" max="100">
+                                <label for="range_k">K</label>
+                            </div>
+                            <div class="range_slider">
+                                <input type="range" id="range_t" name="range_t"
+                                        min="0" max="100">
+                                <label for="range_t">Tn</label>
+                            </div>
+                            <div class="range_slider">
+                                <input type="range" id="range_t" name="range_t"
+                                        min="0" max="100">
+                                <label for="range_t">Tv</label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="control_loop_element" id="controlled_system">
@@ -46,7 +85,28 @@
                     <button class="information_button">i</button>
                 </div>
                 <div class="control_loop_element_bottom_row">
-                    <b>bottom row</b>
+                    <div class="element_value">
+                        <b>PT2</b>
+                    </div>
+                    <div class="element_visualisation">
+                        <div class="range_slider_box" id="system_range_slider_box">
+                            <div class="range_slider">
+                                <input type="range" id="range_k" name="range_k"
+                                        min="0" max="100">
+                                <label for="range_k">K</label>
+                            </div>
+                            <div class="range_slider">
+                                <input type="range" id="range_t" name="range_t"
+                                        min="0" max="100">
+                                <label for="range_t">D</label>
+                            </div>
+                            <div class="range_slider">
+                                <input type="range" id="range_t" name="range_t"
+                                        min="0" max="100">
+                                <label for="range_t">w</label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="control_loop_element" id="output_variable">
@@ -74,7 +134,6 @@
         </div>
     </div>   
 </body>
-
 
 <script
     src="https://code.jquery.com/jquery-3.6.0.min.js"

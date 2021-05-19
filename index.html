@@ -32,6 +32,7 @@
             <div class="control_loop_plot" id="output_plot"></div>
         </div>
         <div class="control_loop_top_row">
+            <!-- Eingang. -->
             <div class="control_loop_element" id="input_variable">
                 <div class="control_loop_element_top_row">
                     <b class="element_description">Sollwert</b>
@@ -40,13 +41,18 @@
                 </div>
                 <div class="control_loop_element_bottom_row">
                     <div class="element_value">
-                        <b>Sprung</b>
+                        <select class="control_loop_dropdown" id="input_selection">
+                            <option value="sprung">Sprung</option>
+                            <option value="impuls">Impuls</option>
+                            <option value="sinus">Sinus</option>
+                        </select>
                     </div>
-                    <div class="element_visualisation">
-                        <b>_|'</b>
+                    <div class="element_visualization">
+                        <img class ="value_visualization" id="input_visualization" src="img/sprung.png" alt="input">
                     </div>
                 </div>
             </div>
+            <!-- Regler. -->
             <div class="control_loop_element" id="controller">
                 <div class="control_loop_element_top_row">
                     <b class="element_description">Regler</b>
@@ -55,29 +61,26 @@
                 </div>
                 <div class="control_loop_element_bottom_row">
                     <div class="element_value">
-                        <b>PID</b>
+                        <select class="control_loop_dropdown" id="controller_selection">
+                            <option value="P">P</option>
+                            <option value="I">I</option>
+                            <option value="D">D</option>
+                            <option value="PI">PI</option>
+                            <option value="PD">PD</option>
+                            <option value="PID">PID</option>
+                        </select>
                     </div>
-                    <div class="element_visualisation">
+                    <div class="element_visualization">
                         <div class="range_slider_box" id="controller_range_slider_box">
                             <div class="range_slider">
-                                <input type="range" id="range_k" name="range_k"
-                                        min="0" max="100">
+                                <input type="range" id="range_k" min="0" max="100" value="10">
                                 <label for="range_k">K</label>
-                            </div>
-                            <div class="range_slider">
-                                <input type="range" id="range_t" name="range_t"
-                                        min="0" max="100">
-                                <label for="range_t">Tn</label>
-                            </div>
-                            <div class="range_slider">
-                                <input type="range" id="range_t" name="range_t"
-                                        min="0" max="100">
-                                <label for="range_t">Tv</label>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+            <!-- Regelstrecke. -->
             <div class="control_loop_element" id="controlled_system">
                 <div class="control_loop_element_top_row">
                     <b class="element_description">Regelstrecke</b>
@@ -86,29 +89,23 @@
                 </div>
                 <div class="control_loop_element_bottom_row">
                     <div class="element_value">
-                        <b>PT2</b>
+                        <select class="control_loop_dropdown" id="system_selection">
+                            <option value="P">P</option>
+                            <option value="PT1">PT1</option>
+                            <option value="PT2">PT2</option>
+                        </select>
                     </div>
-                    <div class="element_visualisation">
+                    <div class="element_visualization">
                         <div class="range_slider_box" id="system_range_slider_box">
                             <div class="range_slider">
-                                <input type="range" id="range_k" name="range_k"
-                                        min="0" max="100">
+                                <input type="range" id="range_k" min="0" max="100" value="10">
                                 <label for="range_k">K</label>
-                            </div>
-                            <div class="range_slider">
-                                <input type="range" id="range_t" name="range_t"
-                                        min="0" max="100">
-                                <label for="range_t">D</label>
-                            </div>
-                            <div class="range_slider">
-                                <input type="range" id="range_t" name="range_t"
-                                        min="0" max="100">
-                                <label for="range_t">w</label>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+            <!-- Ausgang. -->
             <div class="control_loop_element" id="output_variable">
                 <div class="control_loop_element_top_row">
                     <b class="element_description">Regelgröße</b>
@@ -116,11 +113,11 @@
                     <button class="information_button">i</button>
                 </div>
                 <div class="control_loop_element_bottom_row">
-                    <b>bottom row</b>
                 </div>
             </div>
         </div>
         <div class="control_loop_bottom_row">
+            <!-- Messeinheit. -->
             <div class="control_loop_element" id="measuring_element">
                 <div class="control_loop_element_top_row">
                     <b class="element_description">Messglied</b>
@@ -128,7 +125,20 @@
                     <button class="information_button">i</button>
                 </div>
                 <div class="control_loop_element_bottom_row">
-                    <b>bottom row</b>
+                    <div class="element_value">
+                        <select class="control_loop_dropdown" id="measurement_selection">
+                            <option value="P">P</option>
+                            <option value="PT1">PT1</option>
+                        </select>
+                    </div>
+                    <div class="element_visualization">
+                        <div class="range_slider_box" id="measurement_range_slider_box">
+                            <div class="range_slider">
+                                <input type="range" id="range_k" min="0" max="100" value="10">
+                                <label for="range_k">K</label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

@@ -52,21 +52,22 @@ h1 {
     display: flex;
     justify-content: center;
     flex-direction: column;
-    width: 18%;
-    height: 120px;
+    width: 22em;
+    height: 8em;
     margin: 0;
     padding: 0;
-    background-color: #f1faee;
-    border: 2px solid #457b9d;
+    background-color: #a0c4ff;
+    border: 2px solid #012a4a;
     border-radius: 10px;
-    box-shadow: 0 0.5em 1em -0.125em rgb(10 10 10 / 40%), 0 0 0 1px rgb(10 10 10 / 20%);
+    box-shadow: 0 0 0.5em -0.2em #1d3556;
     text-align: center;
     transition: ease 0.3s;
     z-index: 1;
 }
 
 .control_loop_element:hover {
-    border-color: red;
+    border-color: #2c7da0;
+    box-shadow: 0 0 0.5em -0.1em #1d3556;
 }
 
 .control_loop_element_top_row {
@@ -84,14 +85,35 @@ h1 {
 
 .element_value {
     flex-grow: 1;
-    text-align: center;
     align-self: center;
-    font-size: 1.5rem;
 }
 
-.element_visualisation {
+.control_loop_dropdown {
+    font-size: 1.5rem;
+    text-align-last: center;
+    background-color: #fffffc;
+    border: 1px solid #012a4a;
+    border-radius: 0.5em;
+    width: 3em;
+    height: 2.5em;
+    appearance: none;
+    font-weight: bold;
+}
+
+#input_selection {
+    width: 6em;
+}
+
+.element_visualization {
     flex-grow: 2;
     align-self: center;
+}
+
+.value_visualization {
+    width: 4em;
+    height: 4em;
+    border: 2px solid #555;
+    border-radius: 0.5em;
 }
 
 .range_slider_box {
@@ -114,21 +136,7 @@ h1 {
 .element_description {
     flex-grow: 1;
     align-self: center;
-}
-
-#input_variable {
-}
-
-#controller {
-}
-
-#controlled_system {
-}
-
-#output_variable {
-}
-
-#measuring_element {
+    text-decoration: underline;
 }
 
 .control_loop_element button {

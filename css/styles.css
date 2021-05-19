@@ -34,8 +34,19 @@ h1 {
 }
 
 .control_loop_plot {
-    width: 20%;
-    height: 400px;
+    display: inline-block;
+    position: relative;
+    width: 100%;
+    height: 320px;
+    vertical-align: top;
+    overflow: hidden;
+}
+
+.svg_content_responsive {
+    display: inline-block;
+    position: absolute;
+    top: 10px;
+    left: 0;
 }
 
 .control_loop_top_row {
@@ -53,6 +64,7 @@ h1 {
     justify-content: center;
     flex-direction: column;
     width: 22em;
+    max-width: 18%;
     height: 8em;
     margin: 0;
     padding: 0;

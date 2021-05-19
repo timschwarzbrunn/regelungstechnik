@@ -67,18 +67,23 @@ window.onresize = draw_control_loop_arrows;
 
 
 // set the dimensions and margins of the graph
-var margin = {top: 30, right: 30, bottom: 30, left: 30},
-    width = 400 - margin.left - margin.right,
-    height = 400 - margin.top - margin.bottom;
+let rect = document.querySelector('.control_loop_plot').getBoundingClientRect()
+
+var margin = {top: 50, right: 50, bottom: 50, left: 50},
+    width = rect.width - margin.left - margin.right,
+    height = rect.height - margin.top - margin.bottom;
 
 // append the svg object to the body of the page
 var sVg = d3.selectAll(".control_loop_plot")
   .append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
+    .classed("svg_content_responsive", true)
+    //.attr("preserveAspectRatio", "xMidYMid meet")
+    //.attr("viewBox", "0 0 " + width + " " + height)
   // translate this svg element to leave some margin.
   .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 // X scale and Axis
 var x = d3.scaleLinear()

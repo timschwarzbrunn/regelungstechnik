@@ -1,3 +1,4 @@
+<!-- LEARNING CONTROL SYSTEMS ENGINEERING WITH INTERACTIVE VISUALIZATION. -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,17 +6,23 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Regelungstechnik</title>
+    <!-- Import Google Fonts (Roboto). -->
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/styles.css">
+    <!-- Import our css-stylesheets. -->
+    <link rel="stylesheet" href="css/basic_styles.css">
+    <link rel="stylesheet" href="css/control_loop_styles.css">
 </head>
 
+<!-- Create an SVG-drawing-area for the control loop arrows. -->
 <svg class="background_svg_draw_area" xmlns="http://www.w3.org/2000/svg">
+    <!-- Define an arrow head for the control loop arrows. -->
     <defs>
         <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
             <polygon points="0 0, 10 3.5, 0 7" />
         </marker>
     </defs>
+    <!-- Create the line elements. They paths will be defined using javascript. -->
     <line id="line_input_to_controller"></line>
     <line id="line_controller_to_system"></line>
     <line id="line_system_to_output"></line>
@@ -25,20 +32,28 @@
 
 <body>
     <h1>Learning Control Systems Engineering with Interactive Visualization</h1>
+    <!-- Create a control loop that contains three D3-charts and the basic control loop elements. -->
     <div class="control_loop">
+        <!-- Three D3 charts on top of the control loop. -->
         <div class="control_loop_plots">
             <div class="control_loop_plot" id="input_plot"></div>
             <div class="control_loop_plot" id="control_plot"></div>
             <div class="control_loop_plot" id="output_plot"></div>
         </div>
+        <!-- Control loop elements in the top row (input, controller, system, output). -->
         <div class="control_loop_top_row">
-            <!-- Eingang. -->
+            <!-- Input. -->
+            <!-- Choose between different input functions (step, ...). -->
             <div class="control_loop_element" id="input_variable">
+                <!-- Every control loop element is divided into a top and a bottom row. -->
+                <!-- The top row contains the element name and two buttons. -->
+                <!-- The bottom row contains elements to select the value of the element. -->
                 <div class="control_loop_element_top_row">
                     <b class="element_description">Sollwert</b>
                     <button class="expand_button">+</button>
                     <button class="information_button">i</button>
                 </div>
+                <!-- The input element has a dropdown and an image that shows the input function as a symbol. -->
                 <div class="control_loop_element_bottom_row">
                     <div class="element_value">
                         <select class="control_loop_dropdown" id="input_selection">
@@ -52,7 +67,8 @@
                     </div>
                 </div>
             </div>
-            <!-- Regler. -->
+            <!-- Controller. -->
+            <!-- Choose between different controller types (P, I, D, PID, ...). -->
             <div class="control_loop_element" id="controller">
                 <div class="control_loop_element_top_row">
                     <b class="element_description">Regler</b>
@@ -71,6 +87,8 @@
                         </select>
                     </div>
                     <div class="element_visualization">
+                        <!-- Depending on the chosen controller type some range sliders will appear (using javascript). -->
+                        <!-- The user can change the controller constants. -->
                         <div class="range_slider_box" id="controller_range_slider_box">
                             <div class="range_slider">
                                 <input type="range" id="range_k" min="0" max="100" value="10">
@@ -80,7 +98,8 @@
                     </div>
                 </div>
             </div>
-            <!-- Regelstrecke. -->
+            <!-- Controlled system. -->
+            <!-- Choose between different system types (PT1, PT2, ...). -->
             <div class="control_loop_element" id="controlled_system">
                 <div class="control_loop_element_top_row">
                     <b class="element_description">Regelstrecke</b>
@@ -96,6 +115,7 @@
                         </select>
                     </div>
                     <div class="element_visualization">
+                        <!-- Just like the controller element the system element allows to change some constants. -->
                         <div class="range_slider_box" id="system_range_slider_box">
                             <div class="range_slider">
                                 <input type="range" id="range_k" min="0" max="100" value="10">
@@ -105,7 +125,7 @@
                     </div>
                 </div>
             </div>
-            <!-- Ausgang. -->
+            <!-- Output. -->
             <div class="control_loop_element" id="output_variable">
                 <div class="control_loop_element_top_row">
                     <b class="element_description">Regelgröße</b>
@@ -116,8 +136,9 @@
                 </div>
             </div>
         </div>
+        <!-- The bottom row of the control loop contains the measuring element. -->
         <div class="control_loop_bottom_row">
-            <!-- Messeinheit. -->
+            <!-- Measuring Element. -->
             <div class="control_loop_element" id="measuring_element">
                 <div class="control_loop_element_top_row">
                     <b class="element_description">Messglied</b>
@@ -145,14 +166,18 @@
     </div>   
 </body>
 
+<!-- Import Javascript. -->
+<!-- Import jquery. -->
 <script
     src="https://code.jquery.com/jquery-3.6.0.min.js"
     integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
     crossorigin="anonymous">
 </script>
+<!-- Import D3 for the charts. -->
 <script 
     src="https://d3js.org/d3.v6.min.js">
 </script>
+<!-- Import some own javascript files. -->
 <script 
     src="js/functions.js">
 </script>

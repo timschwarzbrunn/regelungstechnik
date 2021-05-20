@@ -1,8 +1,8 @@
-html {
-    font-family: 'Roboto', sans-serif;
-    background-color: #ffffff;
-}
+/* This stylesheet contains css informations about the control loop visualization. */
 
+/* ######################################################################## */
+/*                          Control loop in general.                        */
+/* ######################################################################## */
 
 .background_svg_draw_area {
     position: absolute;
@@ -14,18 +14,17 @@ html {
     z-index: 0;
 }
 
-h1 {
-    text-align: center;
-    font-style: italic;
-    text-decoration: underline;
-}
-
 .control_loop {
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
     gap: 50px;
 }
+
+
+/* ######################################################################## */
+/*                 D3-charts on top of the control loop.                    */
+/* ######################################################################## */
 
 .control_loop_plots {
     position: relative;
@@ -39,7 +38,7 @@ h1 {
     width: 100%;
     height: 320px;
     vertical-align: top;
-    overflow: hidden;
+    /* overflow: hidden; */
 }
 
 .svg_content_responsive {
@@ -48,6 +47,11 @@ h1 {
     top: 10px;
     left: 0;
 }
+
+
+/* ######################################################################## */
+/*                          Control loop layout.                            */
+/* ######################################################################## */
 
 .control_loop_top_row {
     display: flex;

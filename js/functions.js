@@ -1,6 +1,8 @@
 // General constants.
 const control_loop_element_border_radius = 10;
 const arrow_width = 10;
+const time_max = 10;  // Seconds.
+const time_step = 0.1; 
 
 // This function draws a connecting line with an arrow between two elements.
 function draw_arrow (from, to, line_id) {
@@ -61,59 +63,75 @@ function draw_control_loop_arrows() {
 }
 
 draw_control_loop_arrows();
-window.onresize = draw_control_loop_arrows;
+window.addEventListener('resize', function(event) {
+  draw_control_loop_arrows();
+  plot_input_function();
+}, true);
 
 
-
-
-// set the dimensions and margins of the graph
-let rect = document.querySelector('.control_loop_plot').getBoundingClientRect()
-
-var margin = {top: 50, right: 50, bottom: 50, left: 50},
+// This function draws the input plot.
+function plot_input_function() {
+  // Get the div-element.
+  let div_svg = d3.select('#input_plot');
+  // Clear everything that is currently inside the div-element.
+  div_svg.node().innerHTML = '';
+  // Get the dimension of the div-element.
+  let rect = div_svg.node().getBoundingClientRect()
+  // Set the margin, width and height of the plot (needed for the axis).
+  var margin = {top: 10, right: 30, bottom: 30, left: 60},
     width = rect.width - margin.left - margin.right,
     height = rect.height - margin.top - margin.bottom;
+  // Create the svg-element and add the x- and y-axis.
+  let plot_svg = div_svg
+    .append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+      .attr("transform",
+            "translate(" + margin.left + "," + margin.top + ")");
+  // x-Axis.
+  let x_axis = d3.scaleLinear()
+    .domain([0, time_max])      // Value-range.
+    .range([0, width]);   // Pixel-range.
+  plot_svg.append("g")
+    .attr("transform", "translate(0," + height/2 + ")")
+    .call(d3.axisBottom(x_axis));
 
-// append the svg object to the body of the page
-var sVg = d3.selectAll(".control_loop_plot")
-  .append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-    .classed("svg_content_responsive", true)
-    //.attr("preserveAspectRatio", "xMidYMid meet")
-    //.attr("viewBox", "0 0 " + width + " " + height)
-  // translate this svg element to leave some margin.
-  .append("g")
-  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+  // y-Axis.
+  var y_axis = d3.scaleLinear()
+    .domain([-1.5, 1.5])
+    .range([height, 0]);
+  plot_svg.append("g")
+    .call(d3.axisLeft(y_axis));
 
-// X scale and Axis
-var x = d3.scaleLinear()
-    .domain([0, 100])         // This is the min and the max of the data: 0 to 100 if percentages
-    .range([0, width]);       // This is the corresponding value I want in Pixel
-sVg
-  .append('g')
-  .attr("transform", "translate(0," + height + ")")
-  .call(d3.axisBottom(x));
+  // Get the input data (depending on the chosen input function).
+  let input_selection = document.querySelector('#input_selection');
+  let data = [];
+  if (input_selection.value == "sprung") {
+    data = [{x: -1, y:0}, {x: 0, y:0}, {x: 0, y:1}, {x: time_max, y:1}]
+  }
+  else if (input_selection.value == "impuls") {
+    data = [{x: -1, y:0}, {x: 0, y:0}, {x: 0, y:1}, {x: time_step, y:1}, {x: time_step, y:0}, {x: time_max, y:0}]
+  }
+  else if (input_selection.value == "sinus") {
+    for (let t = 0; t <= time_max; t = t + time_step) {
+      data.push({x: t, y: Math.sin(t)});
+    }
+  }
 
-// X scale and Axis
-var y = d3.scaleLinear()
-    .domain([0, 10])         // This is the min and the max of the data: 0 to 100 if percentages
-    .range([height, 0]);       // This is the corresponding value I want in Pixel
-sVg
-  .append('g')
-  .call(d3.axisLeft(y));
+  // Add the line.
+  plot_svg
+    .append("path")
+      .datum(data)
+      .attr("fill", "none")
+      .attr("stroke", "steelblue")
+      .attr("stroke-width", 3)
+      .attr("d", d3.line()
+        .x(function(d) { return x_axis(d.x) })
+        .y(function(d) { return y_axis(d.y) }));
+}
 
-// Create data
-var data = [ {x:10, y:20}, {x:40, y:90}, {x:80, y:50} ]
-
-// Add 3 dots for 0, 50 and 100%
-sVg
-  .selectAll("whatever")
-  .data(data)
-  .enter()
-  .append("circle")
-    .attr("cx", function(d){ return x(d.x) })
-    .attr("cy", function(d){ return y(d.y) })
-    .attr("r", 7)
+plot_input_function();
 
 
 // Input visualization. Change the image inside the input_control_loop_element depending on the input-function.
@@ -122,6 +140,8 @@ input_selection.addEventListener('change', (event) => {
   // Change the image.
   let input_visualization_image = document.querySelector('#input_visualization');
   input_visualization_image.src = 'img/' + input_selection.value + '.png';
+  // Redraw the input plot.
+  plot_input_function();
 });
 
 // Controller range slider, system range slider and measuring element range slider. 

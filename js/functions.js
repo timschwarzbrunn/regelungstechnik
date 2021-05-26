@@ -2,7 +2,7 @@
 const control_loop_element_border_radius = 10;
 const arrow_width = 10;
 const time_max = 10;  // Seconds.
-const time_step = 0.1; 
+const time_step = 0.01; 
 
 // This function draws a connecting line with an arrow between two elements.
 function draw_arrow (from, to, line_id) {
@@ -120,19 +120,124 @@ function plot_input_function() {
   }
 
   // Add the line.
+  data = calculate_system_responses();
   plot_svg
     .append("path")
       .datum(data)
       .attr("fill", "none")
       .attr("stroke", "steelblue")
-      .attr("stroke-width", 3)
+      .attr("stroke-width", 1.5)
       .attr("d", d3.line()
-        .x(function(d) { return x_axis(d.x) })
-        .y(function(d) { return y_axis(d.y) }));
+        .x(function(d) { return x_axis(d.t) })
+        .y(function(d) { return y_axis(d.x) }));
 }
 
 plot_input_function();
 
+
+// This function calculates the responses of the complete system.
+function calculate_system_responses() {
+  // Clear the current data.
+  let data = [];
+  // Fill the data with the first values.
+  data.push({
+    t: 0,
+    w: 0,
+    e: 0,
+    u: 0,
+    y: 0,
+    x: 0,
+    x_m: 0
+  });
+  // Get the handles to the different range sliders und selections.
+  let input_selection = document.querySelector('#input_selection');
+  let controller_selection = document.querySelector('#controller_selection');
+  let system_selection = document.querySelector('#system_selection');
+  // Controller.
+  let controller_k, controller_ti, controller_td, controller_tn, controller_tv;
+  if (controller_selection.value == 'P') {
+    controller_k = document.querySelector('#controller_range_k').value;
+  }
+  else if (controller_selection.value == 'I') {
+    controller_ti = document.querySelector('#controller_range_ti').value;
+  }
+  else if (controller_selection.value == 'D') {
+    controller_td = document.querySelector('#controller_range_td').value;
+  }
+  else if (controller_selection.value == 'PI') {
+    controller_k = document.querySelector('#controller_range_k').value;
+    controller_ti = document.querySelector('#controller_range_ti').value;
+  }
+  else if (controller_selection.value == 'PD') {
+    controller_k = document.querySelector('#controller_range_k').value;
+    controller_td = document.querySelector('#controller_range_td').value;
+  }
+  else if (controller_selection.value == 'PID') {
+    controller_k = document.querySelector('#controller_range_k').value;
+    controller_tn = document.querySelector('#controller_range_tn').value;
+    controller_tv = document.querySelector('#controller_range_tv').value;
+  }
+  // System.
+  if (system_selection.value == 'P') {
+    let system_k = document.querySelector('#system_range_k').value;
+  }
+  else if (system_selection.value == 'PT1') {
+    let system_k = document.querySelector('#system_range_k').value;
+    let system_t = document.querySelector('#system_range_t').value;
+  }
+  else if (system_selection.value == 'PT2') {
+    let system_k = document.querySelector('#system_range_k').value;
+    let system_d = document.querySelector('#system_range_d').value;
+    let system_omega = document.querySelector('#system_range_omega').value;
+  }
+  // Iterate and calculate the whole data depending on the chosen parameters.
+  for (let t = time_step; t <= time_max; t += time_step) {
+    data_current = {};
+    data_last = data[data.length - 1];
+    // The time.
+    data_current.t = t;
+    // Calculate the input.
+    if (input_selection.value == "sprung") {
+      data_current.w = 1;
+    }
+    else if (input_selection.value == "impuls") {
+      if (t == time_step) {
+        data_current.w = 1 / time_step;
+      }
+      else {
+        data_current.w = 0;
+      }
+    }
+    else if (input_selection.value == "sinus") {
+      data_current.w = Math.sin(t);
+    }
+    // Calculate the error.
+    data_current.e = data_current.w - data_last.x_m;
+    // Calculate the controller respone depending on the chosen controller.
+    if (controller_selection.value == 'P') {
+      data_current.u = data_current.e * controller_k;
+    }
+    else if (controller_selection.value == 'I') {
+      data_current.u = data_last.u + data_current.e * (time_step / controller_ti);
+    }
+    else if (controller_selection.value == 'D') {
+      data_current.u = (data_current.e - data_last.e) * (controller_td / time_step);
+    }
+    else if (controller_selection.value == 'PI') {
+      data_current.u = data_current.e * controller_k;
+    }
+    // Maybe we should discuss the next step.
+    data_current.y = data_current.u;
+    // Calculate the system response.
+    data_current.x = data_last.x + (2*data_current.y - data_last.x) * 
+      (time_step / (2 + time_step));
+    // Measure the current output value.
+    data_current.x_m = data_current.x * 2;
+    // Append the current data to the whole data.
+    data.push(data_current);
+  }
+  return data;
+}
 
 // Input visualization. Change the image inside the input_control_loop_element depending on the input-function.
 const input_selection = document.querySelector('#input_selection');
@@ -159,27 +264,29 @@ controller_selection.addEventListener('change', (event) => {
   range_slider_box.innerHTML = '';
   // Add the range sliders depending on the chosen controller-type.
   if (controller_selection.value == 'P') {
-    range_slider_box.innerHTML = get_range_slider_html(0, 100, 10, 'range_k', 'K');
+    range_slider_box.innerHTML = get_range_slider_html(0, 100, 10, 'controller_range_k', 'K');
   }
   else if (controller_selection.value == 'I') {
-    range_slider_box.innerHTML = get_range_slider_html(0, 100, 10, 'range_ti', 'T<sub>I</sub>');
+    range_slider_box.innerHTML = get_range_slider_html(0, 100, 10, 'controller_range_ti', 'T<sub>I</sub>');
   }
   else if (controller_selection.value == 'D') {
-    range_slider_box.innerHTML = get_range_slider_html(0, 100, 10, 'range_td', 'T<sub>D</sub>');
+    range_slider_box.innerHTML = get_range_slider_html(0, 100, 10, 'controller_range_td', 'T<sub>D</sub>');
   }
   else if (controller_selection.value == 'PI') {
-    range_slider_box.innerHTML = get_range_slider_html(0, 100, 10, 'range_k', 'K') + 
-      get_range_slider_html(0, 100, 10, 'range_ti', 'T<sub>I</sub>');
+    range_slider_box.innerHTML = get_range_slider_html(0, 100, 10, 'controller_range_k', 'K') + 
+      get_range_slider_html(0, 100, 10, 'controller_range_ti', 'T<sub>I</sub>');
   }
   else if (controller_selection.value == 'PD') {
-    range_slider_box.innerHTML = get_range_slider_html(0, 100, 10, 'range_k', 'K') + 
-      get_range_slider_html(0, 100, 10, 'range_td', 'T<sub>D</sub>');
+    range_slider_box.innerHTML = get_range_slider_html(0, 100, 10, 'controller_range_k', 'K') + 
+      get_range_slider_html(0, 100, 10, 'controller_range_td', 'T<sub>D</sub>');
   }
   else if (controller_selection.value == 'PID') {
-    range_slider_box.innerHTML = get_range_slider_html(0, 100, 10, 'range_k', 'K') + 
-      get_range_slider_html(0, 100, 10, 'range_tn', 'T<sub>N</sub>') + 
-      get_range_slider_html(0, 100, 10, 'range_tv', 'T<sub>V</sub>');
+    range_slider_box.innerHTML = get_range_slider_html(0, 100, 10, 'controller_range_k', 'K') + 
+      get_range_slider_html(0, 100, 10, 'controller_range_tn', 'T<sub>N</sub>') + 
+      get_range_slider_html(0, 100, 10, 'controller_range_tv', 'T<sub>V</sub>');
   }
+  // Plot.
+  plot_input_function();
 });
 const system_selection = document.querySelector('#system_selection');
 system_selection.addEventListener('change', (event) => {
@@ -189,16 +296,16 @@ system_selection.addEventListener('change', (event) => {
   range_slider_box.innerHTML = '';
   // Add the range sliders depending on the chosen system-type.
   if (system_selection.value == 'P') {
-    range_slider_box.innerHTML = get_range_slider_html(0, 100, 10, 'range_k', 'K');
+    range_slider_box.innerHTML = get_range_slider_html(0, 100, 10, 'system_range_k', 'K');
   }
   else if (system_selection.value == 'PT1') {
-    range_slider_box.innerHTML = get_range_slider_html(0, 100, 10, 'range_k', 'K') + 
-      get_range_slider_html(0, 100, 10, 'range_t', 'T');
+    range_slider_box.innerHTML = get_range_slider_html(0, 100, 10, 'system_range_k', 'K') + 
+      get_range_slider_html(0, 100, 10, 'system_range_t', 'T');
   }
   else if (system_selection.value == 'PT2') {
-    range_slider_box.innerHTML = get_range_slider_html(0, 100, 10, 'range_k', 'K') + 
-      get_range_slider_html(0, 100, 10, 'range_d', 'D') + 
-      get_range_slider_html(0, 100, 10, 'range_w', '&omega;<sub>0</sub>');
+    range_slider_box.innerHTML = get_range_slider_html(0, 100, 10, 'system_range_k', 'K') + 
+      get_range_slider_html(0, 100, 10, 'system_range_d', 'D') + 
+      get_range_slider_html(0, 100, 10, 'system_range_omega', '&omega;<sub>0</sub>');
   }
 });
 const measurement_selection = document.querySelector('#measurement_selection');

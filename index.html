@@ -31,9 +31,9 @@
 </svg>
 
 <body>
-    <h1>Learning Control Systems Engineering with Interactive Visualization</h1>
+    <h1>Grundlagen der Regelungstechnik</h1>
     <!-- Create a control loop that contains three D3-charts and the basic control loop elements. -->
-    <div class="control_loop">
+    <div class="control_loop" id="main_control_loop">
         <!-- Three D3 charts on top of the control loop. -->
         <div class="control_loop_plots">
             <div class="control_loop_plot" id="input_plot"></div>
@@ -57,13 +57,13 @@
                 <div class="control_loop_element_bottom_row">
                     <div class="element_value">
                         <select class="control_loop_dropdown" id="input_selection">
-                            <option value="sprung">Sprung</option>
-                            <option value="impuls">Impuls</option>
+                            <option value="step">Sprung</option>
+                            <option value="impulse">Impuls</option>
                             <option value="sinus">Sinus</option>
                         </select>
                     </div>
                     <div class="element_visualization">
-                        <img class ="value_visualization" id="input_visualization" src="img/sprung.png" alt="input">
+                        <img class ="value_visualization" id="input_visualization" src="img/step.png" alt="input">
                     </div>
                 </div>
             </div>
@@ -91,8 +91,29 @@
                         <!-- The user can change the controller constants. -->
                         <div class="range_slider_box" id="controller_range_slider_box">
                             <div class="range_slider">
-                                <input type="range" id="controller_range_k" min="0" max="100" value="10">
+                                <input type="range" id="controller_range_k" min="0.05" max="10" value="1.0" step="0.05">
                                 <label for="controller_range_k">K</label>
+                                <label for="controller_range_k" class="range_value_output"></label>
+                            </div>
+                            <div class="range_slider">
+                                <input type="range" id="controller_range_ti" min="0.05" max="10" value="5" step="0.05">
+                                <label for="controller_range_ti">T<sub>I</sub></label>
+                                <label for="controller_range_ti" class="range_value_output"></label>
+                            </div>
+                            <div class="range_slider">
+                                <input type="range" id="controller_range_td" min="0.001" max="1" value="0.5" step="0.001">
+                                <label for="controller_range_td">T<sub>D</sub></label>
+                                <label for="controller_range_td" class="range_value_output"></label>
+                            </div>
+                            <div class="range_slider">
+                                <input type="range" id="controller_range_tn" min="0" max="100" value="10">
+                                <label for="controller_range_tn">T<sub>N</sub></label>
+                                <label for="controller_range_tn" class="range_value_output"></label>
+                            </div>
+                            <div class="range_slider">
+                                <input type="range" id="controller_range_tv" min="0" max="100" value="10">
+                                <label for="controller_range_tv">T<sub>V</sub></label>
+                                <label for="controller_range_tv" class="range_value_output"></label>
                             </div>
                         </div>
                     </div>
@@ -118,8 +139,24 @@
                         <!-- Just like the controller element the system element allows to change some constants. -->
                         <div class="range_slider_box" id="system_range_slider_box">
                             <div class="range_slider">
-                                <input type="range" id="system_range_k" min="0" max="100" value="10">
+                                <input type="range" id="system_range_k" min="0.05" max="10" value="0.6" step="0.05">
                                 <label for="system_range_k">K</label>
+                                <label for="system_range_k" class="range_value_output"></label>
+                            </div>
+                            <div class="range_slider">
+                                <input type="range" id="system_range_t" min="0" max="10" value="2" step="0.1">
+                                <label for="system_range_t">T</label>
+                                <label for="system_range_t" class="range_value_output"></label>
+                            </div>
+                            <div class="range_slider">
+                                <input type="range" id="system_range_d" min="0" max="100" value="10">
+                                <label for="system_range_d">D</label>
+                                <label for="system_range_d" class="range_value_output"></label>
+                            </div>
+                            <div class="range_slider">
+                                <input type="range" id="system_range_omega" min="0" max="100" value="10">
+                                <label for="system_range_omega">&omega;<sub>0</sub></label>
+                                <label for="system_range_omega" class="range_value_output"></label>
                             </div>
                         </div>
                     </div>
@@ -155,8 +192,14 @@
                     <div class="element_visualization">
                         <div class="range_slider_box" id="measurement_range_slider_box">
                             <div class="range_slider">
-                                <input type="range" id="range_k" min="0" max="100" value="10">
-                                <label for="range_k">K</label>
+                                <input type="range" id="measurement_range_k" min="0.05" max="5" value="1" step="0.05">
+                                <label for="measurement_range_k">K</label>
+                                <label for="measurement_range_k" class="range_value_output"></label>
+                            </div>
+                            <div class="range_slider">
+                                <input type="range" id="measurement_range_t" min="0" max="10" value="1" step="0.1">
+                                <label for="measurement_range_t">T</label>
+                                <label for="measurement_range_t" class="range_value_output"></label>
                             </div>
                         </div>
                     </div>

@@ -105,12 +105,12 @@
 }
 
 .control_loop_dropdown {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     text-align-last: center;
     background-color: #fffffc;
     border: 1px solid #012a4a;
     border-radius: 0.5em;
-    width: 3em;
+    width: 2.5em;
     height: 2.5em;
     appearance: none;
     font-weight: bold;
@@ -147,6 +147,10 @@
 
 .range_slider label {
     flex: 1 1 20px;
+}
+
+.range_slider .range_value_output {
+    flex: 2 1 20px;
 }
 
 .element_description {

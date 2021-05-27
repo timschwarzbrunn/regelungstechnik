@@ -1,8 +1,8 @@
 // General constants.
 const control_loop_element_border_radius = 10;
 const arrow_width = 10;
-const time_max = 100;  // Seconds.
-const time_step = 0.005; 
+const time_max = 10;  // Seconds.
+const time_step = 0.001; 
 
 // This function draws a connecting line with an arrow between two elements.
 function draw_arrow (from, to, line_id) {
@@ -65,7 +65,7 @@ function draw_control_loop_arrows() {
 draw_control_loop_arrows();
 window.addEventListener('resize', function(event) {
   draw_control_loop_arrows();
-  // PLOT!!
+  control_loop_handler.calc_and_plot();
 }, true);
 
 function plot_basic_chart(div_svg, data, options) {
@@ -85,31 +85,53 @@ function plot_basic_chart(div_svg, data, options) {
     .append("g")
       .attr("transform",
             "translate(" + margin.left + "," + margin.top + ")");
-  // x-Axis.
+
+  // Set the graph-title.
+  plot_svg
+    .append("text")
+      .attr("x", (width / 2))             
+      .attr("y", 10)
+      .attr("text-anchor", "middle")  
+      .style("font-size", "1rem") 
+      .style("text-decoration", "underline")  
+      .text(options.title);
+
+  // x-axis.
   let x_axis = d3.scaleLinear()
     .domain([options.x_min, options.x_max]) // Value-range.
     .range([0, width]);   // Pixel-range.
-  plot_svg.append("g")
-    .attr("transform", "translate(0," + height/2 + ")")
-    .call(d3.axisBottom(x_axis));
+  plot_svg
+    .append("g")
+      .attr("transform", "translate(0," + height / 2 + ")")
+      .call(d3.axisBottom(x_axis));
+  // x-axis-label.
+  plot_svg
+    .append("text")
+      .attr("text-anchor", "end")
+      .attr("x", width)
+      .attr("y", height / 2 + margin.top + 30)
+      .text('Zeit t');
 
-  // y-Axis.
+  // y-axis.
   var y_axis = d3.scaleLinear()
     .domain([options.y_min, options.y_max])
     .range([height, 0]);
-  plot_svg.append("g")
-    .call(d3.axisLeft(y_axis));
-
-  // Add the line.
   plot_svg
-    .append("path")
-    .datum(data)
-    .attr("fill", "none")
-    .attr("stroke", "steelblue")
-    .attr("stroke-width", 2)
-    .attr("d", d3.line()
-      .x(function(d) { return x_axis(d[options.x_value]) })
-      .y(function(d) { return y_axis(d[options.y_value]) }));
+    .append("g")
+      .call(d3.axisLeft(y_axis));
+
+  // Add the line(s).
+  for (let i = 0;  i < options.y_value.length; i++) {
+    plot_svg
+      .append("path")
+        .datum(data)
+        .attr("fill", "none")
+        .attr("stroke", options.stroke_color[i])
+        .attr("stroke-width", 2)
+        .attr("d", d3.line()
+          .x(function(d) { return x_axis(d[options.x_value]) })
+          .y(function(d) { return y_axis(d[options.y_value[i]]) }));
+  }
 }
 
 
@@ -149,8 +171,20 @@ class ControlLoopHandler {
     });
     // Iterate and calculate the whole data depending on the chosen parameters.
     for (let t = time_step; t <= time_max; t += time_step) {
-      let data_current = {};
+      let data_current = {
+        t: 0,
+        w: 0,
+        e: 0,
+        u: 0,
+        y: 0,
+        x: 0,
+        x_m: 0
+      };
       let data_last = this.data[this.data.length - 1];
+      let data_pre_last = this.data[this.data.length - 2];
+      if (data_pre_last == undefined) {
+        data_pre_last = data_last;
+      }
       // The time.
       data_current.t = t;
       // Calculate the input.
@@ -158,11 +192,11 @@ class ControlLoopHandler {
       // Calculate the error.
       data_current.e = data_current.w - data_last.x_m;
       // Calculate the controller response depending on the chosen controller.
-      data_current = this.controller.calc(data_current, data_last);
+      data_current = this.controller.calc(data_current, data_last, data_pre_last);
       // Maybe we should discuss the next step.
       data_current.y = data_current.u;
       // Calculate the system response.
-      data_current = this.system.calc(data_current, data_last);
+      data_current = this.system.calc(data_current, data_last, data_pre_last);
       // Measure the current output value.
       data_current = this.measurement.calc(data_current, data_last);
       // Append the current data to the whole data.
@@ -216,7 +250,9 @@ class ControlLoopElementInput {
   // Plot the input signal.
   plot(data) {
     // Create a basic chart and add the line.
-    plot_basic_chart(this.div_svg, data, {x_min: 0, x_max: time_max, y_min: -2, y_max: 2, x_value: 't', y_value: 'w'});
+    plot_basic_chart(this.div_svg, data, 
+      {x_min: 0, x_max: time_max, y_min: -2, y_max: 2, x_value: 't', 
+      y_value: ['w', 'e'], stroke_color: ['#012a4a', '#e63946'], title: 'Sollwert und Reglerabweichung'});
   }
 }
 
@@ -331,7 +367,7 @@ class ControlLoopElementController {
   }
 
   // Calculate the controller response depending on the chosen controller.
-  calc(data_current, data_last) {
+  calc(data_current, data_last, data_pre_last) {
     data_current.u = 0;
     if (this.type == 'P') {
       data_current.u = data_current.e * this.parameter.K;
@@ -345,6 +381,9 @@ class ControlLoopElementController {
     else if (this.type == 'PI') {
       data_current.u = data_current.e * this.parameter.K + data_last.u + data_current.e * (time_step / this.parameter.Ti);
     }
+    else if (this.type == 'PID') {
+      data_current.u = data_current.e * ((this.parameter.K*time_step^2 + this.parameter.K*this.parameter.Tn*this.parameter.Tv + this.parameter.K*this.parameter.Tn*time_step)/(this.parameter.Tn*time_step)) + data_last.e * (-(2*this.parameter.K*this.parameter.Tn*this.parameter.Tv + this.parameter.K*this.parameter.Tn*time_step)/(this.parameter.Tn*time_step)) + data_pre_last.e * ((this.parameter.K*this.parameter.Tv)/time_step) - data_pre_last.u * (-1);
+    }
     if (isFinite(data_current.u) == false) {
       data_current.u = 0;
     }
@@ -354,7 +393,9 @@ class ControlLoopElementController {
   // Plot the controller signal.
   plot(data) {
     // Create a basic chart and add the line.
-    plot_basic_chart(this.div_svg, data, {x_min: 0, x_max: time_max, y_min: -2, y_max: 2, x_value: 't', y_value: 'u'});
+    plot_basic_chart(this.div_svg, data, 
+      {x_min: 0, x_max: time_max, y_min: -2, y_max: 2, x_value: 't', 
+      y_value: ['u'], stroke_color: ['#012a4a'], title: 'Stellgröße'});
   }
 }
 
@@ -410,6 +451,8 @@ class ControlLoopElementSystem {
       // Redraw the plots.
       this.control_loop_handler.calc_and_plot();
     });
+    this.selection.value = 'PT1';
+    this.type = 'PT1';
     // Toggle the visibility once.
     this.toggle_range_slider_visibility();
   }
@@ -437,18 +480,19 @@ class ControlLoopElementSystem {
   }
 
   // Calculate the controller response depending on the chosen system.
-  calc(data_current, data_last) {
+  calc(data_current, data_last, data_pre_last) {
     data_current.x = 0;
     if (this.type == 'P') {
       data_current.x = data_current.y * this.parameter.K;
     }
     else if (this.type == 'PT1') {
-      data_current.x = data_last.x + (this.parameter.K * data_current.y - data_last.x) * 
-        (time_step / (this.parameter.T + time_step));
+      //data_current.x = data_last.x + (this.parameter.K * data_current.y - data_last.x) * 
+      //  (time_step / (this.parameter.T + time_step));
+      data_current.x = ((this.parameter.K * time_step) / (2 * this.parameter.T + time_step)) * (data_current.y + data_last.y) -
+        ((time_step - 2 * this.parameter.T) / (time_step + 2 * this.parameter.T)) * data_last.x; 
     }
     else if (this.type == 'PT2') {
-      data_current.x = data_last.x + (this.parameter.K * data_current.y - data_last.x) * 
-        (time_step / (this.parameter.T + time_step));
+      data_current.x = data_current.y * ((this.parameter.K*this.parameter.omega^2*time_step^2)/(this.parameter.omega^2*time_step^2 + 2*this.parameter.D*this.parameter.omega*time_step + 1)) - u_1 * (-(2*this.parameter.D*this.parameter.omega*time_step + 2)/(this.parameter.omega^2*time_step^2 + 2*this.parameter.D*this.parameter.omega*time_step + 1)) - data_current.x * (1/(this.parameter.omega^2*time_step^2 + 2*this.parameter.D*this.parameter.omega*time_step + 1));
     }
     if (isFinite(data_current.x) == false) {
       data_current.x = 0;
@@ -459,7 +503,9 @@ class ControlLoopElementSystem {
   // Plot the controller signal.
   plot(data) {
     // Create a basic chart and add the line.
-    plot_basic_chart(this.div_svg, data, {x_min: 0, x_max: time_max, y_min: -2, y_max: 2, x_value: 't', y_value: 'x'});
+    plot_basic_chart(this.div_svg, data, 
+      {x_min: 0, x_max: time_max, y_min: -2, y_max: 2, x_value: 't', 
+      y_value: ['x'], stroke_color: ['#012a4a'], title: 'Regelgröße'});
   }
 }
 

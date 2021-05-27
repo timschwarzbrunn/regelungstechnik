@@ -4,6 +4,26 @@
 /*                          Control loop in general.                        */
 /* ######################################################################## */
 
+html {
+    font-family: 'Roboto', sans-serif;
+    background-color: #ffffff;
+}
+
+
+h1 {
+    text-align: center;
+    font-style: italic;
+    text-decoration: underline;
+    margin-bottom: 0;
+    margin-top: 10px;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
 .background_svg_draw_area {
     position: absolute;
     top: 0; bottom: 0; right: 0; left: 0;
@@ -19,6 +39,20 @@
     flex-direction: column;
     flex-wrap: wrap;
     gap: 50px;
+}
+
+#main_control_loop {
+    flex: 2 1 500px;
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
+}
+
+article {
+    flex: 1 2 100px;
+    position: relative;
+    float: right;
 }
 
 

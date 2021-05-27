@@ -1,12 +1,2 @@
 /* This stylesheet contains css informations about basic elements like html and h1. */
 
-html {
-    font-family: 'Roboto', sans-serif;
-    background-color: #ffffff;
-}
-
-h1 {
-    text-align: center;
-    font-style: italic;
-    text-decoration: underline;
-}

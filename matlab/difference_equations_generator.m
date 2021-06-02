@@ -14,61 +14,125 @@ syms this__parameter__omega
 element_name = 'Controller: P element';
 G_s = this__parameter__K;
 disp([element_name, ': '])
-disp(get_difference_equation(G_s, 'e', 'u'))
+disp('Tustin:')
+disp(get_difference_equation(G_s, 'e', 'u', 'tustin'))
+disp('Backwards:')
+disp(get_difference_equation(G_s, 'e', 'u', 'backwards'))
+disp('Forwards:')
+disp(get_difference_equation(G_s, 'e', 'u', 'forwards'))
 disp(' ')
 
 element_name = 'Controller: I element';
 G_s = 1 / (this__parameter__Ti * s);
 disp([element_name, ': '])
-disp(get_difference_equation(G_s, 'e', 'u'))
+disp('Tustin:')
+disp(get_difference_equation(G_s, 'e', 'u', 'tustin'))
+disp('Backwards:')
+disp(get_difference_equation(G_s, 'e', 'u', 'backwards'))
+disp('Forwards:')
+disp(get_difference_equation(G_s, 'e', 'u', 'forwards'))
 disp(' ')
 
 element_name = 'Controller: D element';
 G_s = this__parameter__Td * s;
 disp([element_name, ': '])
-disp(get_difference_equation(G_s, 'e', 'u'))
+disp('Tustin:')
+disp(get_difference_equation(G_s, 'e', 'u', 'tustin'))
+disp('Backwards:')
+disp(get_difference_equation(G_s, 'e', 'u', 'backwards'))
+disp('Forwards:')
+disp(get_difference_equation(G_s, 'e', 'u', 'forwards'))
+disp(' ')
+
+element_name = 'Controller: PI element';
+G_s = this__parameter__K * (1 + 1 / (this__parameter__Tn * s));
+disp([element_name, ': '])
+disp('Tustin:')
+disp(get_difference_equation(G_s, 'e', 'u', 'tustin'))
+disp('Backwards:')
+disp(get_difference_equation(G_s, 'e', 'u', 'backwards'))
+disp('Forwards:')
+disp(get_difference_equation(G_s, 'e', 'u', 'forwards'))
+disp(' ')
+
+element_name = 'Controller: PD element';
+G_s = this__parameter__K * (1 + this__parameter__Tv * s);
+disp([element_name, ': '])
+disp('Tustin:')
+disp(get_difference_equation(G_s, 'e', 'u', 'tustin'))
+disp('Backwards:')
+disp(get_difference_equation(G_s, 'e', 'u', 'backwards'))
+disp('Forwards:')
+disp(get_difference_equation(G_s, 'e', 'u', 'forwards'))
 disp(' ')
 
 element_name = 'Controller: PID element';
 G_s = this__parameter__K * (1 + 1 / (this__parameter__Tn * s) + this__parameter__Tv * s);
 disp([element_name, ': '])
-disp(get_difference_equation(G_s, 'e', 'u'))
+disp('Tustin:')
+disp(get_difference_equation(G_s, 'e', 'u', 'tustin'))
+disp('Backwards:')
+disp(get_difference_equation(G_s, 'e', 'u', 'backwards'))
+disp('Forwards:')
+disp(get_difference_equation(G_s, 'e', 'u', 'forwards'))
+disp(' ')
+
+element_name = 'Controller: PIDT1 element';
+G_s = this__parameter__K * (1 + 1 / (this__parameter__Tn * s) + (this__parameter__Tv * s) / (1 + 0.002 * s));
+disp([element_name, ': '])
+disp('Tustin:')
+disp(get_difference_equation(G_s, 'e', 'u', 'tustin'))
+disp('Backwards:')
+disp(get_difference_equation(G_s, 'e', 'u', 'backwards'))
+disp('Forwards:')
+disp(get_difference_equation(G_s, 'e', 'u', 'forwards'))
 disp(' ')
 
 element_name = 'System: PT1 element';
 G_s = this__parameter__K / (this__parameter__T * s + 1);
 disp([element_name, ': '])
-disp(get_difference_equation(G_s, 'y', 'x'))
+disp('Tustin:')
+disp(get_difference_equation(G_s, 'y', 'x', 'tustin'))
+disp('Backwards:')
+disp(get_difference_equation(G_s, 'y', 'x', 'backwards'))
+disp('Forwards:')
+disp(get_difference_equation(G_s, 'y', 'x', 'forwards'))
 disp(' ')
 
 element_name = 'System: PT2 element';
-G_s = ((this__parameter__K * this__parameter__omega^2) / ...
-    (s^2 + 2*this__parameter__D*this__parameter__omega*s + this__parameter__omega^2));
+%G_s = ((this__parameter__K * this__parameter__omega^2) / ...
+%    (s^2 + 2*this__parameter__D*this__parameter__omega*s + this__parameter__omega^2));
+G_s = (this__parameter__K) / ...
+    (1 + ((2 * this__parameter__D) / (this__parameter__omega)) * s + (1 / (this__parameter__omega^2)) * s^2);
 disp([element_name, ': '])
-disp(get_difference_equation(G_s, 'y', 'x'))
+disp('Tustin:')
+disp(get_difference_equation(G_s, 'y', 'x', 'tustin'))
+disp('Backwards:')
+disp(get_difference_equation(G_s, 'y', 'x', 'backwards'))
+disp('Forwards:')
+disp(get_difference_equation(G_s, 'y', 'x', 'forwards'))
 disp(' ')
 
 
-
-
-function diff_eq = get_difference_equation(G_s, input_variable, output_variable)
+function diff_eq = get_difference_equation(G_s, input_variable, output_variable, algorithm)
     % The transfer function (symbolic) is given.
     syms s z time_step
     % z-Transformation.
-    algorithm = 'tustin';
     if strcmp(algorithm,'tustin')
         G_z = subs(G_s, s, (2 * (z - 1)) / (time_step * (z + 1)));
     elseif strcmp(algorithm, 'backwards')
         G_z = subs(G_s, s, (z - 1) / (z * time_step));
+    elseif strcmp(algorithm, 'forwards')
+        G_z = subs(G_s, s, (z - 1) / (time_step));
     end
     % Simplify.
     G_z = simplifyFraction(G_z, 'Expand', true);
     % Get the coefficients of the num and den.
     [num, den] = numden(G_z);
-    num_coeffs = coeffs(num, z);
-    den_coeffs = coeffs(den, z);
+    num_coeffs = coeffs(num, z, 'All');
+    den_coeffs = coeffs(den, z, 'All');
     if (length(num_coeffs) > length(den_coeffs))
-        disp('WARNING!')
+        disp(['WARNING! Algorithm: ', algorithm, '. num_coeffs > den_coeffs.'])
     end
     % At first calculate the input part.                        
     for i = length(num_coeffs):-1:1                             %#ok<*AGROW>

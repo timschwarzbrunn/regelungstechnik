@@ -4,25 +4,6 @@
 /*                          Control loop in general.                        */
 /* ######################################################################## */
 
-html {
-    font-family: 'Roboto', sans-serif;
-    background-color: #ffffff;
-}
-
-
-h1 {
-    text-align: center;
-    font-style: italic;
-    text-decoration: underline;
-    margin-bottom: 0;
-    margin-top: 10px;
-}
-
-body {
-    margin: 0;
-    padding: 0;
-    display: flex;
-}
 
 .background_svg_draw_area {
     position: absolute;
@@ -49,12 +30,6 @@ body {
     align-self: flex-start;
 }
 
-article {
-    flex: 1 2 100px;
-    position: relative;
-    float: right;
-}
-
 
 /* ######################################################################## */
 /*                 D3-charts on top of the control loop.                    */
@@ -72,6 +47,7 @@ article {
     width: 100%;
     height: 320px;
     vertical-align: top;
+    transition: ease 0.6s;
     /* overflow: hidden; */
 }
 
@@ -111,7 +87,7 @@ article {
     border-radius: 10px;
     box-shadow: 0 0 0.5em -0.2em #1d3556;
     text-align: center;
-    transition: ease 0.3s;
+    transition: all ease 0.6s, visibility 1ms;
     z-index: 1;
 }
 
@@ -147,6 +123,7 @@ article {
     height: 2.5em;
     appearance: none;
     font-weight: bold;
+    transition: all ease 0.6s, visibility 1ms;
 }
 
 #input_selection {
@@ -201,43 +178,10 @@ article {
     margin: 3px;
     font-weight: bold;
     text-align: center;
-    transition: ease 0.3s;
+    transition: all ease 0.6s, visibility 1ms;
     box-shadow: 0 0.2em 0.2em -0.1em rgb(10 10 10 / 40%), 0 0 0 1px rgb(10 10 10 / 20%);
 }
 
 .control_loop_element button:hover {
     background-color: #457b9d;
-}
-
-
-
-article {
-    background-color:rgb(200 200 200 / 20%);
-}
-
-.scroll_section_filler {
-    height: 400px;
-}
-
-.scroll_section {
-    display: table;
-    width: 100%;
-	height: 300px;
-    transition: ease 0.6s;
-    padding-top: 100px;
-    padding-bottom: 100px;
-}
-
-.scroll_section_content {
-    display: table-cell;
-    vertical-align: middle;
-    text-align: center;
-    font-size: 2rem;
-    
-}
-
-.marked {
-    border-color: #f95738;
-    background-color: #a1c9fd;
-    box-shadow: 0 0 0.7em -0.1em #ee964b;
 }

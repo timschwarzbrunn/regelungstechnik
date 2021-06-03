@@ -74,7 +74,7 @@ function plot_basic_chart(div_svg, data, options) {
   // Get the dimension of the div-element.
   let rect = div_svg.node().getBoundingClientRect();
   // Set the margin, width and height of the plot (needed for the axis).
-  var margin = {top: 10, right: 30, bottom: 30, left: 60},
+  var margin = {top: 30, right: 30, bottom: 30, left: 60},
     width = rect.width - margin.left - margin.right,
     height = rect.height - margin.top - margin.bottom;
   // Create the svg-element and add the x- and y-axis.
@@ -135,11 +135,6 @@ function plot_basic_chart(div_svg, data, options) {
 }
 
 
-// Put this someday somewhere else.
-for (let slider_output of document.querySelectorAll('.range_value_output')) {
-  slider_output.innerHTML = Number(slider_output.parentNode.querySelector('input').value).toFixed(2);
-}
-
 // Classes.
 class ControlLoopHandler {
   constructor(control_loop_id) {
@@ -151,6 +146,10 @@ class ControlLoopHandler {
     this.system = new ControlLoopElementSystem(this);
     this.measurement = new ControlLoopElementMeasurement(this);
     this.data = [];
+    // Update the range slider value labels.
+    for (let slider_output of this.control_loop.querySelectorAll('.range_value_output')) {
+      slider_output.innerHTML = Number(slider_output.parentNode.querySelector('input').value).toFixed(2);
+    }
     // Plot the first time.
     this.calc_and_plot();
   }

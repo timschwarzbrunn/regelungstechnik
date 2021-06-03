@@ -12,6 +12,7 @@
     <!-- Import our css-stylesheets. -->
     <link rel="stylesheet" href="css/basic_styles.css">
     <link rel="stylesheet" href="css/control_loop_styles.css">
+    <link rel="stylesheet" href="css/scrollytelling_styles.css">
     <!-- Icon. (https://favicon.io/favicon-converter/) -->
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -96,28 +97,28 @@
                         <!-- Depending on the chosen controller type some range sliders will appear (using javascript). -->
                         <!-- The user can change the controller constants. -->
                         <div class="range_slider_box" id="controller_range_slider_box">
-                            <div class="range_slider">
-                                <input type="range" id="controller_range_k" min="0.05" max="10" value="8.0" step="0.05">
+                            <div class="range_slider" id="range_slider_controller_k">
+                                <input type="range" id="controller_range_k" min="0.05" max="10" value="1.0" step="0.05">
                                 <label for="controller_range_k">K</label>
                                 <label for="controller_range_k" class="range_value_output"></label>
                             </div>
-                            <div class="range_slider">
+                            <div class="range_slider" id="range_slider_controller_ti">
                                 <input type="range" id="controller_range_ti" min="0.05" max="10" value="5" step="0.05">
                                 <label for="controller_range_ti">T<sub>I</sub></label>
                                 <label for="controller_range_ti" class="range_value_output"></label>
                             </div>
-                            <div class="range_slider">
+                            <div class="range_slider" id="range_slider_controller_td">
                                 <input type="range" id="controller_range_td" min="0.001" max="1" value="0.5" step="0.001">
                                 <label for="controller_range_td">T<sub>D</sub></label>
                                 <label for="controller_range_td" class="range_value_output"></label>
                             </div>
-                            <div class="range_slider">
-                                <input type="range" id="controller_range_tn" min="0.0001" max="10" value="0.0001" step="0.0001">
+                            <div class="range_slider" id="range_slider_controller_tn">
+                                <input type="range" id="controller_range_tn" min="0.0001" max="10" value="5" step="0.0001">
                                 <label for="controller_range_tn">T<sub>N</sub></label>
                                 <label for="controller_range_tn" class="range_value_output"></label>
                             </div>
-                            <div class="range_slider">
-                                <input type="range" id="controller_range_tv" min="0.0001" max="10" value="0.0001" step="0.000001">
+                            <div class="range_slider" id="range_slider_controller_tv">
+                                <input type="range" id="controller_range_tv" min="0.0001" max="10" value="0.5" step="0.000001">
                                 <label for="controller_range_tv">T<sub>V</sub></label>
                                 <label for="controller_range_tv" class="range_value_output"></label>
                             </div>
@@ -144,22 +145,22 @@
                     <div class="element_visualization">
                         <!-- Just like the controller element the system element allows to change some constants. -->
                         <div class="range_slider_box" id="system_range_slider_box">
-                            <div class="range_slider">
+                            <div class="range_slider" id="range_slider_system_k">
                                 <input type="range" id="system_range_k" min="0.05" max="10" value="1" step="0.05">
                                 <label for="system_range_k">K</label>
                                 <label for="system_range_k" class="range_value_output"></label>
                             </div>
-                            <div class="range_slider">
+                            <div class="range_slider" id="range_slider_system_t">
                                 <input type="range" id="system_range_t" min="0" max="10" value="2" step="0.1">
                                 <label for="system_range_t">T</label>
                                 <label for="system_range_t" class="range_value_output"></label>
                             </div>
-                            <div class="range_slider">
+                            <div class="range_slider" id="range_slider_system_d">
                                 <input type="range" id="system_range_d" min="-2" max="2" value="0" step="0.1">
                                 <label for="system_range_d">D</label>
                                 <label for="system_range_d" class="range_value_output"></label>
                             </div>
-                            <div class="range_slider">
+                            <div class="range_slider" id="range_slider_system_omega">
                                 <input type="range" id="system_range_omega" min="0" max="10" value="0.001" step="0.001">
                                 <label for="system_range_omega">&omega;<sub>0</sub></label>
                                 <label for="system_range_omega" class="range_value_output"></label>
@@ -197,12 +198,12 @@
                     </div>
                     <div class="element_visualization">
                         <div class="range_slider_box" id="measurement_range_slider_box">
-                            <div class="range_slider">
+                            <div class="range_slider" id="range_slider_measurement_k">
                                 <input type="range" id="measurement_range_k" min="0" max="2" value="1" step="0.05">
                                 <label for="measurement_range_k">K</label>
                                 <label for="measurement_range_k" class="range_value_output"></label>
                             </div>
-                            <div class="range_slider">
+                            <div class="range_slider" id="range_slider_measurement_t">
                                 <input type="range" id="measurement_range_t" min="0" max="10" value="1" step="0.1">
                                 <label for="measurement_range_t">T</label>
                                 <label for="measurement_range_t" class="range_value_output"></label>
@@ -212,9 +213,13 @@
                 </div>
             </div>
         </div>
-    </div>   
-    <article>
-    </article>
+    </div>
+    <div class="scrollytelling_sidebar">
+        <div class="progress_container">
+            <div class="progress_bar"></div>
+        </div>
+        <article id="scrollytelling_article"></article>
+    </div>
 </body>
 
 <!-- Import Javascript. -->
@@ -237,7 +242,11 @@
 </script>
 <!-- Import some own javascript files. -->
 <script 
-src="js/control_loop_functions.js">
+    src="js/control_loop_functions.js">
+</script>
+<!-- Import all stories here! -->
+<script
+    src="js/scrollytelling_stories/story_basics_of_the_tool.js">
 </script>
 <script 
     src="js/scrollytelling_functions.js">

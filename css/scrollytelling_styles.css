@@ -10,6 +10,7 @@
     position: relative;
     float: right;
     background-color:rgb(200 200 200 / 20%);
+    border-left: 1px dashed rgb(100 100 100 / 50%);;
 }
 
 #scrollytelling_article {

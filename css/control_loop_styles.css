@@ -48,7 +48,8 @@
     height: 320px;
     vertical-align: top;
     transition: ease 0.6s;
-    /* overflow: hidden; */
+    border-radius: 30px;
+    overflow: hidden;
 }
 
 .svg_content_responsive {
@@ -149,6 +150,8 @@
 
 .range_slider {
     display: flex;
+    border-radius: 5px;
+    transition: all ease 0.6s, visibility 1ms;
 }
 
 .range_slider input {

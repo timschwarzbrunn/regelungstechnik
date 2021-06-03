@@ -94,26 +94,26 @@ iframe {
 /* ######################################################################## */
 
 .control_loop_plot.marked {
-    border-radius: 30px;
-    background-color: #f9c74f55;
+    border-color: #f72d00;
+    box-shadow: 0 0 0.7em -0.1em #f72d00;
+    background-color: #f9c74f22;
 }
 
 .control_loop_element.marked {
-    border-color: #f77f00;
-    background-color: #f9c74f55;
-    box-shadow: 0 0 0.7em -0.1em #ee964b;
+    border-color: #f72d00;
+    box-shadow: 0 0 0.7em -0.1em #f72d00;
 }
 
 .control_loop_dropdown.marked {
-    border-color: #f77f00;
-    background-color: #f9c74f;
-    box-shadow: 0 0 0.7em -0.1em #ee964b;
+    border-color: #f72d00;
+    box-shadow: 0 0 0.7em -0.1em #f72d00;
+    background-color: #faecc9;
 }
 
 .range_slider.marked {
-    border-color: #f77f00;
-    background-color: #f9c74f;
-    box-shadow: 0 0 0.7em -0.1em #ee964b;
+    border-color: #f72d00;
+    box-shadow: 0 0 0.7em -0.1em #faecc9;
+    background-color: #faecc9;
 }
 
 .hidden {

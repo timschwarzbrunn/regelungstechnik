@@ -14,13 +14,8 @@
     <link rel="stylesheet" href="css/control_loop_styles.css">
     <link rel="stylesheet" href="css/scrollytelling_styles.css">
     <!-- Icon. (https://favicon.io/favicon-converter/) -->
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="manifest" href="/site.webmanifest">
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
 </head>
-
-
 
 <body>
     <!-- Create a control loop that contains three D3-charts and the basic control loop elements. -->
@@ -29,18 +24,29 @@
         <svg class="background_svg_draw_area" xmlns="http://www.w3.org/2000/svg">
             <!-- Define an arrow head for the control loop arrows. -->
             <defs>
-                <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
-                    <polygon points="0 0, 10 3.5, 0 7" />
+                <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="0" refY="3" orient="auto">
+                    <polygon points="0 0, 8 3, 0 6"/>
+                </marker>
+                <marker id="arrowhead_marked" markerWidth="8" markerHeight="6" refX="0" refY="3" orient="auto">
+                    <polygon points="0 0, 8 3, 0 6"/>
                 </marker>
             </defs>
             <!-- Create the line elements. They paths will be defined using javascript. -->
-            <line id="line_input_to_controller"></line>
+            <line id="line_input_to_sum_junction"></line>
+            <line id="line_sum_junction_to_controller"></line>
             <line id="line_controller_to_system"></line>
             <line id="line_system_to_output"></line>
-            <path id="line_to_measurement"></path>
-            <path id="line_from_measurement"></path>
+            <path id="path_to_measurement"></path>
+            <path id="path_from_measurement"></path>
+            <circle id="junction_to_measurement"></circle>
+            <circle id="sum_junction"></circle>
+            <text id="text_sum_junction_plus"></text>
+            <text id="text_sum_junction_minus"></text>
+            <text id="text_control_difference"></text>
+            <text id="text_manipulated_variable"></text>
         </svg>
-        <h1>Grundlagen der Regelungstechnik</h1>
+        <!-- Link the header to the github repository. -->
+        <h1><a target="_blank" rel="noopener noreferrer" href="https://github.com/startbit96/regelungstechnik">Grundlagen der Regelungstechnik</a></h1>
         <!-- Three D3 charts on top of the control loop. -->
         <div class="control_loop_plots">
             <div class="control_loop_plot" id="input_plot"></div>
@@ -56,9 +62,7 @@
                 <!-- The top row contains the element name and two buttons. -->
                 <!-- The bottom row contains elements to select the value of the element. -->
                 <div class="control_loop_element_top_row">
-                    <b class="element_description">Sollwert</b>
-                    <button class="expand_button">+</button>
-                    <button class="information_button">i</button>
+                    <span class="element_description">Sollwert / Führungsgröße</span>
                 </div>
                 <!-- The input element has a dropdown and an image that shows the input function as a symbol. -->
                 <div class="control_loop_element_bottom_row">
@@ -78,9 +82,7 @@
             <!-- Choose between different controller types (P, I, D, PID, ...). -->
             <div class="control_loop_element" id="controller">
                 <div class="control_loop_element_top_row">
-                    <b class="element_description">Regler</b>
-                    <button class="expand_button">+</button>
-                    <button class="information_button">i</button>
+                    <span class="element_description">Regler</span>
                 </div>
                 <div class="control_loop_element_bottom_row">
                     <div class="element_value">
@@ -98,17 +100,17 @@
                         <!-- The user can change the controller constants. -->
                         <div class="range_slider_box" id="controller_range_slider_box">
                             <div class="range_slider" id="range_slider_controller_k">
-                                <input type="range" id="controller_range_k" min="0.05" max="10" value="1.0" step="0.05">
+                                <input type="range" id="controller_range_k" min="0.1" max="10" value="1.0" step="0.1">
                                 <label for="controller_range_k">K</label>
                                 <label for="controller_range_k" class="range_value_output"></label>
                             </div>
                             <div class="range_slider" id="range_slider_controller_ti">
-                                <input type="range" id="controller_range_ti" min="0.05" max="10" value="5" step="0.05">
+                                <input type="range" id="controller_range_ti" min="0.1" max="10" value="5" step="0.1">
                                 <label for="controller_range_ti">T<sub>I</sub></label>
                                 <label for="controller_range_ti" class="range_value_output"></label>
                             </div>
                             <div class="range_slider" id="range_slider_controller_td">
-                                <input type="range" id="controller_range_td" min="0.001" max="1" value="0.5" step="0.001">
+                                <input type="range" id="controller_range_td" min="0.1" max="10" value="5" step="0.1">
                                 <label for="controller_range_td">T<sub>D</sub></label>
                                 <label for="controller_range_td" class="range_value_output"></label>
                             </div>
@@ -130,9 +132,7 @@
             <!-- Choose between different system types (PT1, PT2, ...). -->
             <div class="control_loop_element" id="controlled_system">
                 <div class="control_loop_element_top_row">
-                    <b class="element_description">Regelstrecke</b>
-                    <button class="expand_button">+</button>
-                    <button class="information_button">i</button>
+                    <span class="element_description">Regelstrecke</span>
                 </div>
                 <div class="control_loop_element_bottom_row">
                     <div class="element_value">
@@ -146,22 +146,22 @@
                         <!-- Just like the controller element the system element allows to change some constants. -->
                         <div class="range_slider_box" id="system_range_slider_box">
                             <div class="range_slider" id="range_slider_system_k">
-                                <input type="range" id="system_range_k" min="0.05" max="10" value="1" step="0.05">
+                                <input type="range" id="system_range_k" min="0.1" max="10" value="2" step="0.1">
                                 <label for="system_range_k">K</label>
                                 <label for="system_range_k" class="range_value_output"></label>
                             </div>
                             <div class="range_slider" id="range_slider_system_t">
-                                <input type="range" id="system_range_t" min="0" max="10" value="2" step="0.1">
+                                <input type="range" id="system_range_t" min="0.1" max="10" value="2" step="0.1">
                                 <label for="system_range_t">T</label>
                                 <label for="system_range_t" class="range_value_output"></label>
                             </div>
                             <div class="range_slider" id="range_slider_system_d">
-                                <input type="range" id="system_range_d" min="-2" max="2" value="0" step="0.1">
+                                <input type="range" id="system_range_d" min="-2" max="2" value="0.2" step="0.1">
                                 <label for="system_range_d">D</label>
                                 <label for="system_range_d" class="range_value_output"></label>
                             </div>
                             <div class="range_slider" id="range_slider_system_omega">
-                                <input type="range" id="system_range_omega" min="0" max="10" value="0.001" step="0.001">
+                                <input type="range" id="system_range_omega" min="0" max="10" value="1" step="0.001">
                                 <label for="system_range_omega">&omega;<sub>0</sub></label>
                                 <label for="system_range_omega" class="range_value_output"></label>
                             </div>
@@ -172,9 +172,7 @@
             <!-- Output. -->
             <div class="control_loop_element" id="output_variable">
                 <div class="control_loop_element_top_row">
-                    <b class="element_description">Regelgröße</b>
-                    <button class="expand_button">+</button>
-                    <button class="information_button">i</button>
+                    <span class="element_description">Regelgröße</span>
                 </div>
                 <div class="control_loop_element_bottom_row">
                 </div>
@@ -185,9 +183,7 @@
             <!-- Measuring Element. -->
             <div class="control_loop_element" id="measuring_element">
                 <div class="control_loop_element_top_row">
-                    <b class="element_description">Messglied</b>
-                    <button class="expand_button">+</button>
-                    <button class="information_button">i</button>
+                    <span class="element_description">Messglied</span>
                 </div>
                 <div class="control_loop_element_bottom_row">
                     <div class="element_value">
@@ -204,7 +200,7 @@
                                 <label for="measurement_range_k" class="range_value_output"></label>
                             </div>
                             <div class="range_slider" id="range_slider_measurement_t">
-                                <input type="range" id="measurement_range_t" min="0" max="10" value="1" step="0.1">
+                                <input type="range" id="measurement_range_t" min="0.1" max="5" value="0.1" step="0.1">
                                 <label for="measurement_range_t">T</label>
                                 <label for="measurement_range_t" class="range_value_output"></label>
                             </div>
@@ -245,9 +241,26 @@
     src="js/control_loop_functions.js">
 </script>
 <!-- Import all stories here! -->
-<script
-    src="js/scrollytelling_stories/story_basics_of_the_tool.js">
+<script 
+    src="js/scrollytelling_stories/fundamentals_of_control_systems_engineering.js">
 </script>
+<script 
+    src="js/scrollytelling_stories/controlled_system.js">
+</script>
+<script 
+    src="js/scrollytelling_stories/closed_loop_control.js">
+</script>
+<script 
+    src="js/scrollytelling_stories/measuring_element.js">
+</script>
+<script 
+    src="js/scrollytelling_stories/how_to_contribute.js">
+</script>
+<!-- Config the available stories inside the follow js-file. -->
+<script
+    src="js/scrollytelling_config.js">
+</script>
+<!-- Import scrollytelling functions. -->
 <script 
     src="js/scrollytelling_functions.js">
 </script>

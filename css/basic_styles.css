@@ -5,12 +5,16 @@ html {
     background-color: #ffffff;
 }
 
+a {
+    color: inherit;
+}
 
 h1 {
     text-align: center;
     text-decoration: underline;
-    margin-bottom: 0;
-    margin-top: 10px;
+    margin: 0;
+    padding: 0;
+    z-index: 1;
 }
 
 body {

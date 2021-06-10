@@ -1,80 +1,213 @@
 // General constants.
-const control_loop_element_border_radius = 10;
-const arrow_width = 10;
-const time_max = 10;  // Seconds.
+const time_max = 20;  // Seconds.
 const time_step = 0.001; 
 
-// This function draws a connecting line with an arrow between two elements.
-function draw_arrow (from, to, line_id) {
-  let line = $(line_id);   
-  let div1 = $(from);   
-  let div2 = $(to);
-  
-  let pos1 = div1.position();
-  let pos2 = div2.position();
-  
-  line
-    .attr('x1', pos1.left + div1.width())
-    .attr('y1', pos1.top + div1.height() / 2 + control_loop_element_border_radius / 2)
-    .attr('x2', pos2.left - control_loop_element_border_radius - arrow_width)
-    .attr('y2', pos2.top + div2.height() / 2 + control_loop_element_border_radius / 2)
-    .attr('stroke', 'black')
-    .attr('stroke-width', 2)
-    .attr('marker-end', "url(#arrowhead)");
-}
-
-function draw_control_loop_arrows() {
-  draw_arrow('#input_variable', '#controller', '#line_input_to_controller');
-  draw_arrow('#controller', '#controlled_system', '#line_controller_to_system');
-  draw_arrow('#controlled_system', '#output_variable', '#line_system_to_output');
-  let div_input = $('#input_variable');
-  let div_controller = $('#controller');
-  let div_controlled_system = $('#controlled_system');
-  let div_output = $('#output_variable');
-  let div_measuring_element = $('#measuring_element');
-  let path_to_measurement = $('#line_to_measurement');
-  let path_from_measurement = $('#line_from_measurement');
-  // To measurement.
-  let start_position_x = div_controlled_system.position().left + div_controlled_system.width();
-  start_position_x = start_position_x + (div_output.position().left - start_position_x) / 2;
-  let start_position_y = div_controlled_system.position().top + div_controlled_system.height() / 2 + control_loop_element_border_radius / 2;
-  let end_position_x = div_measuring_element.position().left + div_measuring_element.width() + control_loop_element_border_radius + arrow_width;
-  let end_position_y = div_measuring_element.position().top + div_measuring_element.height() / 2 + control_loop_element_border_radius / 2;
-  path_to_measurement
-    .attr('d', "M" + start_position_x + " " + start_position_y + " V" + (end_position_y - control_loop_element_border_radius)  + 
-      "a" + control_loop_element_border_radius + "," + control_loop_element_border_radius + " 1 0 1 -10,10 H" + end_position_x)
-    .attr('fill', 'none')
-    .attr('stroke', 'black')
-    .attr('stroke-width', 2)
-    .attr('marker-end', "url(#arrowhead)");
-  // From measurement.
-  start_position_x = div_measuring_element.position().left;
-  start_position_y = div_measuring_element.position().top + div_measuring_element.height() / 2 + control_loop_element_border_radius / 2;
-  end_position_x = div_input.position().left + div_input.width();
-  end_position_x = end_position_x + (div_controller.position().left - end_position_x) / 2;
-  end_position_y = div_input.position().top + div_input.height() / 2 + 1.5 * control_loop_element_border_radius + arrow_width;
-  path_from_measurement
-    .attr('d', "M" + start_position_x + " " + start_position_y + " H" + (end_position_x + control_loop_element_border_radius)  + 
-      "a" + control_loop_element_border_radius + "," + control_loop_element_border_radius + " 0 0 1 -10,-10 V" + end_position_y)
-    .attr('fill', 'none')
-    .attr('stroke', 'black')
-    .attr('stroke-width', 2)
-    .attr('marker-end', "url(#arrowhead)");
-}
-
-draw_control_loop_arrows();
+// What shall happen on resize?
 window.addEventListener('resize', function(event) {
+  // Redraw the arrows.
   draw_control_loop_arrows();
+  // Redraw the plots.
   control_loop_handler.calc_and_plot();
+  // Since the window size is updated with a little delay if the window
+  // was maximized, update everything again with a little delay.
+  setTimeout(function(){
+    // Redraw the arrows.
+    draw_control_loop_arrows();
+    // Redraw the plots.
+    control_loop_handler.calc_and_plot();
+  }, 1000);
 }, true);
 
+
+// This function draws the arrows that connect the control loop elements. 
+function draw_control_loop_arrows() {
+  // General constants.
+  let stroke_width = 2;
+  let arrow_width = document.querySelector('#arrowhead').markerWidth.animVal.value * stroke_width;
+  let junction_radius = 2 * stroke_width;
+  let sum_junction_radius = 3 * stroke_width;
+  let path_radius = 10;
+  let font_size = 14;
+
+  // Get the required control loop elements.
+  let div_input = $('#input_variable');
+  let div_controller = $('#controller');
+  let div_system = $('#controlled_system');
+  let div_output = $('#output_variable');
+  let div_measuring_element = $('#measuring_element');
+
+  // Get the svg-elements.
+  let line_input_to_sum_junction = $('#line_input_to_sum_junction');
+  let line_sum_junction_to_controller = $('#line_sum_junction_to_controller');
+  let line_controller_to_system = $('#line_controller_to_system');
+  let line_system_to_output = $('#line_system_to_output');
+  let path_to_measurement = $('#path_to_measurement');
+  let path_from_measurement = $('#path_from_measurement');
+  let junction_to_measurement = $('#junction_to_measurement');
+  let sum_junction = $('#sum_junction');
+  let text_sum_junction_plus = $('#text_sum_junction_plus');
+  let text_sum_junction_minus = $('#text_sum_junction_minus');
+  let text_control_difference = $('#text_control_difference');
+  let text_manipulated_variable = $('#text_manipulated_variable');
+
+  // Draw line from the input to the sum-junction.
+  line_input_to_sum_junction
+    .attr('x1', div_input.position().left + div_input.outerWidth())
+    .attr('y1', div_input.position().top + div_input.outerHeight() / 2)
+    .attr('x2', div_input.position().left + div_input.outerWidth() + 
+      (div_controller.position().left - (div_input.position().left + div_input.outerWidth())) / 2 -
+      (arrow_width + sum_junction_radius))
+    .attr('y2', div_controller.position().top + div_controller.outerHeight() / 2)
+    .attr('stroke', 'black')
+    .attr('stroke-width', stroke_width)
+    .attr('marker-end', "url(#arrowhead)");
+  
+  // Draw the line from the sum-junction to the controller.
+  line_sum_junction_to_controller
+    .attr('x1', div_input.position().left + div_input.outerWidth() + 
+      (div_controller.position().left - (div_input.position().left + div_input.outerWidth())) / 2 +
+      (sum_junction_radius))
+    .attr('y1', div_input.position().top + div_input.outerHeight() / 2)
+    .attr('x2', div_controller.position().left - arrow_width)
+    .attr('y2', div_controller.position().top + div_controller.outerHeight() / 2)
+    .attr('stroke', 'black')
+    .attr('stroke-width', stroke_width)
+    .attr('marker-end', "url(#arrowhead)");
+
+  // Draw the line from the controller to the controlled system.
+  line_controller_to_system
+    .attr('x1', div_controller.position().left + div_controller.outerWidth())
+    .attr('y1', div_controller.position().top + div_controller.outerHeight() / 2)
+    .attr('x2', div_system.position().left - arrow_width)
+    .attr('y2', div_system.position().top + div_system.outerHeight() / 2)
+    .attr('stroke', 'black')
+    .attr('stroke-width', stroke_width)
+    .attr('marker-end', "url(#arrowhead)");
+
+  // Draw the line from the controlled system to the output.
+  line_system_to_output
+    .attr('x1', div_system.position().left + div_system.outerWidth())
+    .attr('y1', div_system.position().top + div_system.outerHeight() / 2)
+    .attr('x2', div_output.position().left - arrow_width)
+    .attr('y2', div_output.position().top + div_output.outerHeight() / 2)
+    .attr('stroke', 'black')
+    .attr('stroke-width', stroke_width)
+    .attr('marker-end', "url(#arrowhead)");
+
+  // Draw the path from the output to the measuring element.
+  let start_position_x, start_position_y, end_position_x, end_position_y;
+  start_position_x = div_system.position().left + div_system.outerWidth() + 
+    (div_output.position().left - (div_system.position().left + div_system.outerWidth())) / 2;
+  start_position_y = div_system.position().top + div_system.outerHeight() / 2;
+  end_position_x = div_measuring_element.position().left + div_measuring_element.outerWidth() + arrow_width;
+  end_position_y = div_measuring_element.position().top + div_measuring_element.outerHeight() / 2;
+  path_to_measurement
+    .attr('d', "M" + start_position_x + " " + start_position_y + " V" + (end_position_y - path_radius)  + 
+      "a" + path_radius + "," + path_radius + " 1 0 1 -" + path_radius + "," + path_radius + " H" + end_position_x)
+    .attr('fill', 'none')
+    .attr('stroke', 'black')
+    .attr('stroke-width', stroke_width)
+    .attr('marker-end', "url(#arrowhead)");
+
+  // Draw the path from the measuring element to the sum-junction.
+  start_position_x = div_measuring_element.position().left;
+  start_position_y = div_measuring_element.position().top + div_measuring_element.outerHeight() / 2;
+  end_position_x = div_input.position().left + div_input.outerWidth() + 
+    (div_controller.position().left - (div_input.position().left + div_input.outerWidth())) / 2;
+  end_position_y = div_input.position().top + div_input.outerHeight() / 2 + arrow_width + sum_junction_radius;
+  path_from_measurement
+    .attr('d', "M" + start_position_x + " " + start_position_y + " H" + (end_position_x + path_radius)  + 
+      "a" + path_radius + "," + path_radius + " 0 0 1 -" + path_radius + ",-" + path_radius + " V" + end_position_y)
+    .attr('fill', 'none')
+    .attr('stroke', 'black')
+    .attr('stroke-width', stroke_width)
+    .attr('marker-end', "url(#arrowhead)");
+
+  // Draw the junction to the measuring element.
+  junction_to_measurement
+    .attr('cx', div_system.position().left + div_system.outerWidth() + 
+      (div_output.position().left - (div_system.position().left + div_system.outerWidth())) / 2)
+    .attr('cy', div_system.position().top + div_system.outerHeight() / 2)
+    .attr('r', junction_radius)
+    .attr('stroke', 'black');
+  
+  // Draw the sum-junction.
+  sum_junction
+    .attr('cx', div_input.position().left + div_input.outerWidth() + 
+      (div_controller.position().left - (div_input.position().left + div_input.outerWidth())) / 2)
+    .attr('cy', div_input.position().top + div_input.outerHeight() / 2)
+    .attr('r', sum_junction_radius)
+    .attr('fill', 'none')
+    .attr('stroke', 'black')
+    .attr('stroke-width', stroke_width);
+
+  // Position the plus and minus signs from the sum-junction.
+  // Plus.
+  let position_x, position_y;
+  position_x = div_input.position().left + div_input.outerWidth() + 
+    (div_controller.position().left - (div_input.position().left + div_input.outerWidth())) / 2 -
+    (sum_junction_radius * 2);
+  position_y = div_input.position().top + div_input.outerHeight() / 2 - 
+    (sum_junction_radius * 2);
+  text_sum_junction_plus
+    .attr('x', position_x)
+    .attr('y', position_y)
+    .attr('font-size', font_size)
+    .attr('text-anchor', 'middle')
+    .attr('alignment-baseline', 'middle')
+    .text('+');
+
+  // Minus.
+  position_x = div_input.position().left + div_input.outerWidth() + 
+    (div_controller.position().left - (div_input.position().left + div_input.outerWidth())) / 2 -
+    (sum_junction_radius * 2);
+  position_y = div_input.position().top + div_input.outerHeight() / 2 + 
+    (sum_junction_radius * 3);
+  text_sum_junction_minus
+    .attr('x', position_x)
+    .attr('y', position_y)
+    .attr('font-size', font_size)
+    .attr('text-anchor', 'middle')
+    .attr('alignment-baseline', 'middle')
+    .text('-');
+
+  // Position further text.
+  // Control difference.
+  position_x = div_input.position().left + div_input.outerWidth() + 
+    (div_controller.position().left - (div_input.position().left + div_input.outerWidth())) * 3 / 4;
+  position_y = div_controller.position().top + div_controller.outerHeight() / 2 - 5 * stroke_width;
+  text_control_difference
+    .attr('x', position_x)
+    .attr('y', position_y)
+    .attr('font-size', font_size)
+    .attr('alignment-baseline', 'middle')
+    .attr('transform', 'rotate(-90, ' + position_x + ', ' + position_y + ')')
+    .text('Regelabweichung');
+
+  // Manipulated variable.
+  position_x = div_controller.position().left + div_controller.outerWidth() + 
+    (div_system.position().left - (div_controller.position().left + div_controller.outerWidth())) / 2;
+  position_y = div_controller.position().top + div_controller.outerHeight() / 2 - 5 * stroke_width;
+  text_manipulated_variable
+    .attr('x', position_x)
+    .attr('y', position_y)
+    .attr('font-size', font_size)
+    .attr('alignment-baseline', 'middle')
+    .attr('transform', 'rotate(-90, ' + position_x + ', ' + position_y + ')')
+    .text('Stellgröße');
+}
+// Draw the arrows at page load.
+draw_control_loop_arrows();
+
+
+// This function draws a basic line chart.
 function plot_basic_chart(div_svg, data, options) {
   // Clear everything that is currently inside the div-element.
   div_svg.node().innerHTML = '';
   // Get the dimension of the div-element.
   let rect = div_svg.node().getBoundingClientRect();
   // Set the margin, width and height of the plot (needed for the axis).
-  var margin = {top: 30, right: 30, bottom: 30, left: 60},
+  var margin = {top: 10, right: 30, bottom: 10, left: 60},
     width = rect.width - margin.left - margin.right,
     height = rect.height - margin.top - margin.bottom;
   // Create the svg-element and add the x- and y-axis.
@@ -251,7 +384,7 @@ class ControlLoopElementInput {
     // Create a basic chart and add the line.
     plot_basic_chart(this.div_svg, data, 
       {x_min: 0, x_max: time_max, y_min: -2, y_max: 2, x_value: 't', 
-      y_value: ['w', 'e'], stroke_color: ['#012a4a', '#e63946'], title: 'Sollwert und Reglerabweichung'});
+      y_value: ['w', 'e'], stroke_color: ['#0005', '#012a4a'], title: 'Regelabweichung (im Vergleich zum Sollwert)'});
   }
 }
 
@@ -375,18 +508,17 @@ class ControlLoopElementController {
       data_current.u = data_last.u + data_current.e * (time_step / this.parameter.Ti);
     }
     else if (this.type == 'D') {
-      data_current.u = (data_current.e - data_last.e) * (this.parameter.Td / time_step);
+      data_current.u = data_current.e * ((2*this.parameter.Td)/(20*this.parameter.Td - time_step)) + data_last.e * (-(2*this.parameter.Td)/(20*this.parameter.Td - time_step)) - data_last.u * (-(20*this.parameter.Td + time_step)/(20*this.parameter.Td - time_step));
     }
     else if (this.type == 'PI') {
       data_current.u = data_current.e * ((this.parameter.K*this.parameter.Tn + this.parameter.K*time_step)/this.parameter.Tn) + data_last.e * (-this.parameter.K) - data_last.u * (-1);
       //data_current.u = data_current.e * ((2*this.parameter.K*this.parameter.Tn + this.parameter.K*time_step)/(2*this.parameter.Tn)) + data_last.e * (-(2*this.parameter.K*this.parameter.Tn - this.parameter.K*time_step)/(2*this.parameter.Tn)) - data_last.u * (-1);
     }
     else if (this.type == 'PD') {
-      data_current.u = data_current.e * ((this.parameter.K*this.parameter.Tv + this.parameter.K*time_step)/time_step) + data_last.e * (-(this.parameter.K*this.parameter.Tv)/time_step);
-      //data_current.u = data_current.e * ((2*this.parameter.K*this.parameter.Tv + this.parameter.K*time_step)/time_step) + data_last.e * (-(2*this.parameter.K*this.parameter.Tv - this.parameter.K*time_step)/time_step) - data_last.u * (1);
+      data_current.u = data_current.e * ((22*this.parameter.K*this.parameter.Tv - this.parameter.K*time_step)/(20*this.parameter.Tv - time_step)) + data_last.e * (-(22*this.parameter.K*this.parameter.Tv + this.parameter.K*time_step)/(20*this.parameter.Tv - time_step)) - data_last.u * (-(20*this.parameter.Tv + time_step)/(20*this.parameter.Tv - time_step));
     }
     else if (this.type == 'PID') {
-      data_current.u = data_current.e * ((this.parameter.K*this.parameter.Tn + 500*this.parameter.K*this.parameter.Tn*this.parameter.Tv)/this.parameter.Tn) + data_last.e * (-(2*this.parameter.K*this.parameter.Tn + this.parameter.K*time_step + 1000*this.parameter.K*this.parameter.Tn*this.parameter.Tv + 500*this.parameter.K*this.parameter.Tn*time_step)/this.parameter.Tn) + data_pre_last.e * ((this.parameter.K*this.parameter.Tn + this.parameter.K*time_step + 500*this.parameter.K*time_step^2 + 500*this.parameter.K*this.parameter.Tn*this.parameter.Tv + 500*this.parameter.K*this.parameter.Tn*time_step)/this.parameter.Tn) - data_last.u * (-(2*this.parameter.Tn + 500*this.parameter.Tn*time_step)/this.parameter.Tn) - data_pre_last.u * ((this.parameter.Tn + 500*this.parameter.Tn*time_step)/this.parameter.Tn);
+      data_current.u = data_current.e * ((11*this.parameter.K)/10) + data_last.e * (-(22*this.parameter.K*this.parameter.Tn*this.parameter.Tv + this.parameter.K*this.parameter.Tn*time_step + 10*this.parameter.K*this.parameter.Tv*time_step)/(10*this.parameter.Tn*this.parameter.Tv)) + data_pre_last.e * ((this.parameter.K*time_step^2 + 11*this.parameter.K*this.parameter.Tn*this.parameter.Tv + this.parameter.K*this.parameter.Tn*time_step + 10*this.parameter.K*this.parameter.Tv*time_step)/(10*this.parameter.Tn*this.parameter.Tv)) - data_last.u * (-(20*this.parameter.Tn*this.parameter.Tv + this.parameter.Tn*time_step)/(10*this.parameter.Tn*this.parameter.Tv)) - data_pre_last.u * ((10*this.parameter.Tn*this.parameter.Tv + this.parameter.Tn*time_step)/(10*this.parameter.Tn*this.parameter.Tv));
     }
     if (isFinite(data_current.u) == false) {
       data_current.u = 0;
@@ -477,7 +609,7 @@ class ControlLoopElementSystem {
     }
     else if (this.type == 'PT2') {
       this.range_slider_k.parentNode.style.display = 'flex';
-      this.range_slider_t.parentNode.style.display = 'none';
+      this.range_slider_t.parentNode.style.display = 'flex';
       this.range_slider_d.parentNode.style.display = 'flex';
       this.range_slider_omega.parentNode.style.display = 'flex';
     }
@@ -496,7 +628,7 @@ class ControlLoopElementSystem {
         ((time_step - 2 * this.parameter.T) / (time_step + 2 * this.parameter.T)) * data_last.x; 
     }
     else if (this.type == 'PT2') {
-      data_current.x = data_current.y * ((this.parameter.K*this.parameter.omega^2*time_step^2)/(this.parameter.omega^2*time_step^2 - 4*this.parameter.D*this.parameter.omega*time_step + 4)) + data_last.y * ((2*this.parameter.K*this.parameter.omega^2*time_step^2)/(this.parameter.omega^2*time_step^2 - 4*this.parameter.D*this.parameter.omega*time_step + 4)) + data_pre_last.y * ((this.parameter.K*this.parameter.omega^2*time_step^2)/(this.parameter.omega^2*time_step^2 - 4*this.parameter.D*this.parameter.omega*time_step + 4)) - data_last.x * ((2*this.parameter.omega^2*time_step^2 - 8)/(this.parameter.omega^2*time_step^2 - 4*this.parameter.D*this.parameter.omega*time_step + 4)) - data_pre_last.x * ((this.parameter.omega^2*time_step^2 + 4*this.parameter.D*this.parameter.omega*time_step + 4)/(this.parameter.omega^2*time_step^2 - 4*this.parameter.D*this.parameter.omega*time_step + 4));
+      data_current.x = data_current.y * (0) + data_last.y * (0) + data_pre_last.y * ((this.parameter.K*time_step^2)/(this.parameter.D*this.parameter.T)) - data_last.x * (-(2*this.parameter.D*this.parameter.T + this.parameter.D*time_step + this.parameter.T*time_step)/(this.parameter.D*this.parameter.T)) - data_pre_last.x * ((this.parameter.D*this.parameter.T + this.parameter.D*time_step + this.parameter.T*time_step + time_step^2)/(this.parameter.D*this.parameter.T));
     }
     if (isFinite(data_current.x) == false) {
       data_current.x = 0;
@@ -509,7 +641,7 @@ class ControlLoopElementSystem {
     // Create a basic chart and add the line.
     plot_basic_chart(this.div_svg, data, 
       {x_min: 0, x_max: time_max, y_min: -2, y_max: 2, x_value: 't', 
-      y_value: ['x'], stroke_color: ['#012a4a'], title: 'Regelgröße'});
+      y_value: ['w', 'x'], stroke_color: ['#0005', '#012a4a'], title: 'Regelgröße (im Vergleich zum Sollwert)'});
   }
 }
 
@@ -581,4 +713,5 @@ class ControlLoopElementMeasurement {
   }
 }
 
+// The control loop handler.
 let control_loop_handler = new ControlLoopHandler('#main_control_loop');

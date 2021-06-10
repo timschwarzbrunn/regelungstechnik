@@ -9,7 +9,12 @@ function control_loop_transformation(control_loop_id, control_loop_behaviour, mo
                 control_loop.querySelector(element_id).classList.add('marked');
             }
             else if (mode == 'exit') {
-                control_loop.querySelector(element_id).classList.remove('marked');
+                try {
+                    control_loop.querySelector(element_id).classList.remove('marked');
+                }
+                catch (error) {
+                    console.error(error);
+                }
             }
         }
     }
@@ -28,7 +33,12 @@ function control_loop_transformation(control_loop_id, control_loop_behaviour, mo
     if (control_loop_behaviour['unhidden'] != undefined) {
         if (mode == 'enter') {
             for (element_id of control_loop_behaviour['unhidden']) {
-                control_loop.querySelector(element_id).classList.remove('hidden');
+                try {
+                    control_loop.querySelector(element_id).classList.remove('hidden');
+                }
+                catch (error) {
+                    console.error(error);
+                }
             }
         }
     }
@@ -47,19 +57,48 @@ function control_loop_transformation(control_loop_id, control_loop_behaviour, mo
 }
 
 // Progressbar.
-window.onscroll = function() {
+function update_progressbar() {
     var winScroll = document.body.scrollTop || document.documentElement.scrollTop;
     var height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
     var scrolled = (winScroll / height) * 100;
     document.querySelector('.progress_bar').style.width = scrolled + "%";
+}
+window.onscroll = function() {
+    update_progressbar()
 };
 
 
 // This function loads a new story to the scrollytelling sidebar.
 function update_scrollytelling(scrollytelling_content) {
-    let scrollytelling = document.querySelector('#scrollytelling_article');
+    // Show the progressbar.
+    document.querySelector('.progress_container').style.visibility = 'visible';
+    document.querySelector('.progress_bar').style.width = '0%';
     // Delete the old scrollytelling.
+    let scrollytelling = document.querySelector('#scrollytelling_article');
     scrollytelling.innerHTML = '';
+    // Add a sticky back-button to get into the main menu again.
+    let backbutton_wrapper = document.createElement('div');
+    backbutton_wrapper.classList.add('backbutton_wrapper');
+    let backbutton = document.createElement('button');
+    backbutton.innerHTML = '&#8617;';
+    backbutton.classList.add('backbutton');
+    backbutton.addEventListener('click', function() {
+        Waypoint.destroyAll();
+        // Remove all assigned classes during scrollytelling.
+        for (let element of document.querySelectorAll('#main_control_loop *')) {
+            try {
+                element.classList.remove('marked');
+            }
+            catch (error) {}
+            try {
+                element.classList.remove('hidden');
+            }
+            catch (error) {}
+        }
+        show_main_menu();
+    });
+    backbutton_wrapper.appendChild(backbutton);
+    scrollytelling.appendChild(backbutton_wrapper);
     // Add the scroll section header at the top.
     let scroll_section_header = document.createElement('div');
     scroll_section_header.classList.add('scroll_section_header');
@@ -98,13 +137,15 @@ function update_scrollytelling(scrollytelling_content) {
     scroll_section_footer.classList.add('scroll_section_footer');
     let scroll_section_footer_content = document.createElement('div');
     scroll_section_footer_content.classList.add('scroll_section_content');
-    scroll_section_footer_content.innerText = "Weiterführende Videos";
-    // Go to the youtube-video, click on Share --> Embed and copy the src-part of the code into the content.
-    for (video_src of scrollytelling_content.videos) {
-        scroll_section_footer_content.innerHTML += '<iframe src="' + video_src + 
-            '" title="YouTube video player" frameborder="0" ' + 
-            'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" ' + 
-            'allowfullscreen></iframe>';
+    if (scrollytelling_content['videos'] != undefined) {
+        scroll_section_footer_content.innerText = "Weiterführende Videos";
+        // Go to the youtube-video, click on Share --> Embed and copy the src-part of the code into the content.
+        for (video_src of scrollytelling_content.videos) {
+            scroll_section_footer_content.innerHTML += '<iframe src="' + video_src + 
+                '" title="YouTube video player" frameborder="0" ' + 
+                'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" ' + 
+                'allowfullscreen></iframe>';
+        }
     }
     scroll_section_footer.appendChild(scroll_section_footer_content);
     scrollytelling.appendChild(scroll_section_footer);
@@ -116,4 +157,34 @@ function update_scrollytelling(scrollytelling_content) {
     }, 250);
 }
 
-update_scrollytelling(story_basics_ot_the_tool);
+// This function shows the main menue. It will be shown at start and when closing a story.
+function show_main_menu() {
+    // Hide the progressbar.
+    document.querySelector('.progress_container').style.visibility = 'hidden';
+    // Delete the old scrollytelling to make space for the main menu.
+    let scrollytelling = document.querySelector('#scrollytelling_article');
+    scrollytelling.innerHTML = '';
+    // Add the title.
+    let main_menu_title = document.createElement('div');
+    main_menu_title.classList.add('main_menu_title');
+    main_menu_title.innerText = 'Verfügbare Lerninhalte';
+    scrollytelling.appendChild(main_menu_title);
+    // Add the entries.
+    for (let entry of scrollytelling_chapter_overview) {
+        if (entry['title'] == undefined) {
+            continue;
+        }
+        let main_menu_entry = document.createElement('div');
+        main_menu_entry.classList.add('main_menu_entry');
+        main_menu_entry.innerText = entry.title;
+        main_menu_entry.addEventListener('click', (event) => {
+            update_scrollytelling(entry);
+        });
+        scrollytelling.appendChild(main_menu_entry);
+    }
+}
+
+// Show the main menu at start.
+show_main_menu();
+//update_scrollytelling(story_fundamentals_of_control_systems_engineering);
+

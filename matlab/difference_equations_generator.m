@@ -22,6 +22,17 @@ disp('Forwards:')
 disp(get_difference_equation(G_s, 'e', 'u', 'forwards'))
 disp(' ')
 
+element_name = 'Controller: PT1 element';
+G_s = this__parameter__K / (time_step * s + 1);
+disp([element_name, ': '])
+disp('Tustin:')
+disp(get_difference_equation(G_s, 'e', 'u', 'tustin'))
+disp('Backwards:')
+disp(get_difference_equation(G_s, 'e', 'u', 'backwards'))
+disp('Forwards:')
+disp(get_difference_equation(G_s, 'e', 'u', 'forwards'))
+disp(' ')
+
 element_name = 'Controller: I element';
 G_s = 1 / (this__parameter__Ti * s);
 disp([element_name, ': '])
@@ -35,6 +46,17 @@ disp(' ')
 
 element_name = 'Controller: D element';
 G_s = this__parameter__Td * s;
+disp([element_name, ': '])
+disp('Tustin:')
+disp(get_difference_equation(G_s, 'e', 'u', 'tustin'))
+disp('Backwards:')
+disp(get_difference_equation(G_s, 'e', 'u', 'backwards'))
+disp('Forwards:')
+disp(get_difference_equation(G_s, 'e', 'u', 'forwards'))
+disp(' ')
+
+element_name = 'Controller: DT1 element';
+G_s = (this__parameter__Td * s) / (1 + 10 * this__parameter__Td * s);
 disp([element_name, ': '])
 disp('Tustin:')
 disp(get_difference_equation(G_s, 'e', 'u', 'tustin'))
@@ -66,6 +88,17 @@ disp('Forwards:')
 disp(get_difference_equation(G_s, 'e', 'u', 'forwards'))
 disp(' ')
 
+element_name = 'Controller: PDT1 element';
+G_s = this__parameter__K * (1 + (this__parameter__Tv * s) / (1 + 10 * this__parameter__Tv * s));
+disp([element_name, ': '])
+disp('Tustin:')
+disp(get_difference_equation(G_s, 'e', 'u', 'tustin'))
+disp('Backwards:')
+disp(get_difference_equation(G_s, 'e', 'u', 'backwards'))
+disp('Forwards:')
+disp(get_difference_equation(G_s, 'e', 'u', 'forwards'))
+disp(' ')
+
 element_name = 'Controller: PID element';
 G_s = this__parameter__K * (1 + 1 / (this__parameter__Tn * s) + this__parameter__Tv * s);
 disp([element_name, ': '])
@@ -78,7 +111,7 @@ disp(get_difference_equation(G_s, 'e', 'u', 'forwards'))
 disp(' ')
 
 element_name = 'Controller: PIDT1 element';
-G_s = this__parameter__K * (1 + 1 / (this__parameter__Tn * s) + (this__parameter__Tv * s) / (1 + 0.002 * s));
+G_s = this__parameter__K * (1 + 1 / (this__parameter__Tn * s) + (this__parameter__Tv * s) / (1 + 10 * this__parameter__Tv * s));
 disp([element_name, ': '])
 disp('Tustin:')
 disp(get_difference_equation(G_s, 'e', 'u', 'tustin'))
@@ -100,10 +133,8 @@ disp(get_difference_equation(G_s, 'y', 'x', 'forwards'))
 disp(' ')
 
 element_name = 'System: PT2 element';
-%G_s = ((this__parameter__K * this__parameter__omega^2) / ...
-%    (s^2 + 2*this__parameter__D*this__parameter__omega*s + this__parameter__omega^2));
-G_s = (this__parameter__K) / ...
-    (1 + ((2 * this__parameter__D) / (this__parameter__omega)) * s + (1 / (this__parameter__omega^2)) * s^2);
+G_s = ((this__parameter__K * this__parameter__omega^2) / ...
+    (s^2 + 2*this__parameter__D*this__parameter__omega*s + this__parameter__omega^2));
 disp([element_name, ': '])
 disp('Tustin:')
 disp(get_difference_equation(G_s, 'y', 'x', 'tustin'))

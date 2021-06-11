@@ -595,7 +595,7 @@ class ControlLoopElementSystem {
 
   // Toggle the visibility of the range sliders.
   toggle_range_slider_visibility() {
-    if (this.type == 'P') {
+    if (this.type == 'PT0') {
       this.range_slider_k.parentNode.style.display = 'flex';
       this.range_slider_t.parentNode.style.display = 'none';
       this.range_slider_d.parentNode.style.display = 'none';
@@ -618,7 +618,7 @@ class ControlLoopElementSystem {
   // Calculate the controller response depending on the chosen system.
   calc(data_current, data_last, data_pre_last) {
     data_current.x = 0;
-    if (this.type == 'P') {
+    if (this.type == 'PT0') {
       data_current.x = data_current.y * this.parameter.K;
     }
     else if (this.type == 'PT1') {

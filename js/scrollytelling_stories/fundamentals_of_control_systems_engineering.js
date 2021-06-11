@@ -2,12 +2,11 @@
     title: 'Was ist Regelungstechnik?',
     content: [
         {
-            section_html_text: '<b>DIN IEC 60050-351:</b><br> <i>Die Regelung ist ein Vorgang, bei dem fortlaufend eine variable Größe, die Regelgröße, erfasst (gemessen), mit einer anderen variablen Größe, der Führungsgröße, verglichen und im Sinne einer Angleichung an die Führungsgröße beeinflusst wird.</i><br><br>Ganz schön trocken, was?<br>Versuchen wir es einfacher zu erklären.',
-            control_loop_behaviour: {
-            }
+            section_html_text: 'in Arbeit...',
+            control_loop_behaviour: {}
         },
         {
-            section_html_text: 'Im Mittelpunkt einer jeden Regelung steht das zu regelnde technische System. Dieses System wird allgemein <b>Regelstrecke</b> genannt.',
+            section_html_text: 'Das zu regelende System wird allgemein <b>Regelstrecke</b> genannt.<br><br>Regelstrecken können verschiedener Art sein. Es kann sich um einen Elektromotor handeln, um ein mechanisches System oder aber',
             control_loop_behaviour: {
                 marked: ['#controlled_system']
             }
@@ -24,7 +23,7 @@
                 marked: ['#controlled_system']
             }
         },
-            ],
+    ],
     videos: [
         'https://www.youtube.com/embed/l26IGS2RlM0',
         'https://www.youtube.com/embed/1L07JzTJITw'

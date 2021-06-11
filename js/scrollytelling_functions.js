@@ -186,5 +186,3 @@ function show_main_menu() {
 
 // Show the main menu at start.
 show_main_menu();
-//update_scrollytelling(story_fundamentals_of_control_systems_engineering);
-

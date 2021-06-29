@@ -156,29 +156,44 @@ function diff_eq = get_difference_equation(G_s, input_variable, output_variable,
     elseif strcmp(algorithm, 'forwards')
         G_z = subs(G_s, s, (z - 1) / (time_step));
     end
-    % Simplify.
+    % Simplify the equation.
     G_z = simplifyFraction(G_z, 'Expand', true);
-    % Get the coefficients of the num and den.
+    % Get the coefficients of the numerator and denominator.
     [num, den] = numden(G_z);
     num_coeffs = coeffs(num, z, 'All');
     den_coeffs = coeffs(den, z, 'All');
-    if (length(num_coeffs) > length(den_coeffs))
-        disp(['WARNING! Algorithm: ', algorithm, '. num_coeffs > den_coeffs.'])
+    % The coefficients are ordered from the highest to
+    % the lowest degree. Get a_n for further calculation.
+    a_n = den_coeffs(1);
+
+    % The degree of the numerator polynomial must not be greater 
+    % than the denominator polynomial.
+    m = length(num_coeffs) - 1;
+    n = length(den_coeffs) - 1;
+    if (m > n)
+        disp('Error: degree numerator > degree denominator.')
+        %return
     end
-    % At first calculate the input part.                        
-    for i = length(num_coeffs):-1:1                             %#ok<*AGROW>
-        if (i == length(num_coeffs))
-            diff_eq = ['u_0 = e_', num2str(i-length(num_coeffs)), ' * ('];
+
+    % Create the difference equation step by step.
+    diff_eq = 'u_0 = ';
+    % At first calculate the input part.                     
+    for i = m:-1:0                                          %#ok<*AGROW>
+        if (i == n)
+            diff_eq = [diff_eq, 'e_0 * ('];
         else
-            diff_eq = [diff_eq, ' + e_', num2str(i-length(num_coeffs)), ' * ('];
+            diff_eq = [diff_eq, 'e_', num2str(i-n), ' * ('];
         end
-        diff_eq = [diff_eq, char(num_coeffs(i) / den_coeffs(end))];
+        diff_eq = [diff_eq, char(num_coeffs(m+1-i) / a_n)];
         diff_eq = [diff_eq, ')'];
+        if (i > 0)
+            diff_eq = [diff_eq, ' + '];
+        end
     end
     % Calculate the output part.
-    for i = length(den_coeffs)-1:-1:1
-        diff_eq = [diff_eq, ' - u_', num2str(i-length(num_coeffs)), ' * (']; 
-        diff_eq = [diff_eq, char(den_coeffs(i) / den_coeffs(end))];
+    for i = n-1:-1:0
+        diff_eq = [diff_eq, ' - u_', num2str(i-n), ' * (']; 
+        diff_eq = [diff_eq, char(den_coeffs(n+1-i) / a_n)];
         diff_eq = [diff_eq, ')'];
     end
     diff_eq = [diff_eq, ';'];

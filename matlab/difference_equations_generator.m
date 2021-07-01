@@ -23,7 +23,7 @@ disp(get_difference_equation(G_s, 'e', 'u', 'forwards'))
 disp(' ')
 
 element_name = 'Controller: PT1 element';
-G_s = this__parameter__K / (time_step * s + 1);
+G_s = this__parameter__K / (2* time_step * s + 1);
 disp([element_name, ': '])
 disp('Tustin:')
 disp(get_difference_equation(G_s, 'e', 'u', 'tustin'))
@@ -121,6 +121,17 @@ disp('Forwards:')
 disp(get_difference_equation(G_s, 'e', 'u', 'forwards'))
 disp(' ')
 
+element_name = 'System: PT0 element';
+G_s = this__parameter__K / (3 * time_step * s + 1);
+disp([element_name, ': '])
+disp('Tustin:')
+disp(get_difference_equation(G_s, 'y', 'x', 'tustin'))
+disp('Backwards:')
+disp(get_difference_equation(G_s, 'y', 'x', 'backwards'))
+disp('Forwards:')
+disp(get_difference_equation(G_s, 'y', 'x', 'forwards'))
+disp(' ')
+
 element_name = 'System: PT1 element';
 G_s = this__parameter__K / (this__parameter__T * s + 1);
 disp([element_name, ': '])
@@ -142,6 +153,17 @@ disp('Backwards:')
 disp(get_difference_equation(G_s, 'y', 'x', 'backwards'))
 disp('Forwards:')
 disp(get_difference_equation(G_s, 'y', 'x', 'forwards'))
+disp(' ')
+
+element_name = 'Measuring element: PT1 element';
+G_s = this__parameter__K / (this__parameter__T * s + 1);
+disp([element_name, ': '])
+disp('Tustin:')
+disp(get_difference_equation(G_s, 'x', 'x_m', 'tustin'))
+disp('Backwards:')
+disp(get_difference_equation(G_s, 'x', 'x_m', 'backwards'))
+disp('Forwards:')
+disp(get_difference_equation(G_s, 'x', 'x_m', 'forwards'))
 disp(' ')
 
 

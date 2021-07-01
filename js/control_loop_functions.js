@@ -502,23 +502,22 @@ class ControlLoopElementController {
   calc(data_current, data_last, data_pre_last) {
     data_current.u = 0;
     if (this.type == 'P') {
-      data_current.u = data_current.e * this.parameter.K;
+      data_current.u = data_current.e * (this.parameter.K);
     }
     else if (this.type == 'I') {
-      data_current.u = data_last.u + data_current.e * (time_step / this.parameter.Ti);
+      data_current.u = data_current.e * (time_step/(2*this.parameter.Ti)) + data_last.e * (time_step/(2*this.parameter.Ti)) - data_last.u * (-1);
     }
     else if (this.type == 'D') {
-      data_current.u = data_current.e * ((2*this.parameter.Td)/(20*this.parameter.Td - time_step)) + data_last.e * (-(2*this.parameter.Td)/(20*this.parameter.Td - time_step)) - data_last.u * (-(20*this.parameter.Td + time_step)/(20*this.parameter.Td - time_step));
+      data_current.u = data_current.e * ((2*this.parameter.Td)/(20*this.parameter.Td + time_step)) + data_last.e * (-(2*this.parameter.Td)/(20*this.parameter.Td + time_step)) - data_last.u * (-(20*this.parameter.Td - time_step)/(20*this.parameter.Td + time_step));
     }
     else if (this.type == 'PI') {
-      data_current.u = data_current.e * ((this.parameter.K*this.parameter.Tn + this.parameter.K*time_step)/this.parameter.Tn) + data_last.e * (-this.parameter.K) - data_last.u * (-1);
-      //data_current.u = data_current.e * ((2*this.parameter.K*this.parameter.Tn + this.parameter.K*time_step)/(2*this.parameter.Tn)) + data_last.e * (-(2*this.parameter.K*this.parameter.Tn - this.parameter.K*time_step)/(2*this.parameter.Tn)) - data_last.u * (-1);
+      data_current.u = data_current.e * ((2*this.parameter.K*this.parameter.Tn + this.parameter.K*time_step)/(2*this.parameter.Tn)) + data_last.e * (-(2*this.parameter.K*this.parameter.Tn - this.parameter.K*time_step)/(2*this.parameter.Tn)) - data_last.u * (-1);
     }
     else if (this.type == 'PD') {
-      data_current.u = data_current.e * ((22*this.parameter.K*this.parameter.Tv - this.parameter.K*time_step)/(20*this.parameter.Tv - time_step)) + data_last.e * (-(22*this.parameter.K*this.parameter.Tv + this.parameter.K*time_step)/(20*this.parameter.Tv - time_step)) - data_last.u * (-(20*this.parameter.Tv + time_step)/(20*this.parameter.Tv - time_step));
+      data_current.u = data_current.e * ((22*this.parameter.K*this.parameter.Tv + this.parameter.K*time_step)/(20*this.parameter.Tv + time_step)) + data_last.e * (-(22*this.parameter.K*this.parameter.Tv - this.parameter.K*time_step)/(20*this.parameter.Tv + time_step)) - data_last.u * (-(20*this.parameter.Tv - time_step)/(20*this.parameter.Tv + time_step));
     }
     else if (this.type == 'PID') {
-      data_current.u = data_current.e * ((11*this.parameter.K)/10) + data_last.e * (-(22*this.parameter.K*this.parameter.Tn*this.parameter.Tv + this.parameter.K*this.parameter.Tn*time_step + 10*this.parameter.K*this.parameter.Tv*time_step)/(10*this.parameter.Tn*this.parameter.Tv)) + data_pre_last.e * ((this.parameter.K*time_step^2 + 11*this.parameter.K*this.parameter.Tn*this.parameter.Tv + this.parameter.K*this.parameter.Tn*time_step + 10*this.parameter.K*this.parameter.Tv*time_step)/(10*this.parameter.Tn*this.parameter.Tv)) - data_last.u * (-(20*this.parameter.Tn*this.parameter.Tv + this.parameter.Tn*time_step)/(10*this.parameter.Tn*this.parameter.Tv)) - data_pre_last.u * ((10*this.parameter.Tn*this.parameter.Tv + this.parameter.Tn*time_step)/(10*this.parameter.Tn*this.parameter.Tv));
+      data_current.u = data_current.e * ((this.parameter.K*time_step^2 + 44*this.parameter.K*this.parameter.Tn*this.parameter.Tv + 2*this.parameter.K*this.parameter.Tn*time_step + 20*this.parameter.K*this.parameter.Tv*time_step)/(40*this.parameter.Tn*this.parameter.Tv + 2*this.parameter.Tn*time_step)) + data_last.e * ((2*this.parameter.K*time_step^2 - 88*this.parameter.K*this.parameter.Tn*this.parameter.Tv)/(40*this.parameter.Tn*this.parameter.Tv + 2*this.parameter.Tn*time_step)) + data_pre_last.e * ((this.parameter.K*time_step^2 + 44*this.parameter.K*this.parameter.Tn*this.parameter.Tv - 2*this.parameter.K*this.parameter.Tn*time_step - 20*this.parameter.K*this.parameter.Tv*time_step)/(40*this.parameter.Tn*this.parameter.Tv + 2*this.parameter.Tn*time_step)) - data_last.u * (-(80*this.parameter.Tn*this.parameter.Tv)/(40*this.parameter.Tn*this.parameter.Tv + 2*this.parameter.Tn*time_step)) - data_pre_last.u * ((40*this.parameter.Tn*this.parameter.Tv - 2*this.parameter.Tn*time_step)/(40*this.parameter.Tn*this.parameter.Tv + 2*this.parameter.Tn*time_step));
     }
     if (isFinite(data_current.u) == false) {
       data_current.u = 0;
@@ -609,7 +608,7 @@ class ControlLoopElementSystem {
     }
     else if (this.type == 'PT2') {
       this.range_slider_k.parentNode.style.display = 'flex';
-      this.range_slider_t.parentNode.style.display = 'flex';
+      this.range_slider_t.parentNode.style.display = 'none';
       this.range_slider_d.parentNode.style.display = 'flex';
       this.range_slider_omega.parentNode.style.display = 'flex';
     }
@@ -619,16 +618,13 @@ class ControlLoopElementSystem {
   calc(data_current, data_last, data_pre_last) {
     data_current.x = 0;
     if (this.type == 'PT0') {
-      data_current.x = data_current.y * this.parameter.K;
+      data_current.x = data_current.y * (this.parameter.K/7) + data_last.y * (this.parameter.K/7) - data_last.x * (-5/7);
     }
     else if (this.type == 'PT1') {
-      //data_current.x = data_last.x + (this.parameter.K * data_current.y - data_last.x) * 
-      //  (time_step / (this.parameter.T + time_step));
-      data_current.x = ((this.parameter.K * time_step) / (2 * this.parameter.T + time_step)) * (data_current.y + data_last.y) -
-        ((time_step - 2 * this.parameter.T) / (time_step + 2 * this.parameter.T)) * data_last.x; 
+      data_current.x = data_current.y * ((this.parameter.K*time_step)/(2*this.parameter.T + time_step)) + data_last.y * ((this.parameter.K*time_step)/(2*this.parameter.T + time_step)) - data_last.x * (-(2*this.parameter.T - time_step)/(2*this.parameter.T + time_step));
     }
     else if (this.type == 'PT2') {
-      data_current.x = data_current.y * (0) + data_last.y * (0) + data_pre_last.y * ((this.parameter.K*time_step^2)/(this.parameter.D*this.parameter.T)) - data_last.x * (-(2*this.parameter.D*this.parameter.T + this.parameter.D*time_step + this.parameter.T*time_step)/(this.parameter.D*this.parameter.T)) - data_pre_last.x * ((this.parameter.D*this.parameter.T + this.parameter.D*time_step + this.parameter.T*time_step + time_step^2)/(this.parameter.D*this.parameter.T));
+      data_current.x = data_current.y * ((this.parameter.K*this.parameter.omega^2*time_step^2)/(this.parameter.omega^2*time_step^2 + 4*this.parameter.D*this.parameter.omega*time_step + 4)) + data_last.y * ((2*this.parameter.K*this.parameter.omega^2*time_step^2)/(this.parameter.omega^2*time_step^2 + 4*this.parameter.D*this.parameter.omega*time_step + 4)) + data_pre_last.y * ((this.parameter.K*this.parameter.omega^2*time_step^2)/(this.parameter.omega^2*time_step^2 + 4*this.parameter.D*this.parameter.omega*time_step + 4)) - data_last.x * ((2*this.parameter.omega^2*time_step^2 - 8)/(this.parameter.omega^2*time_step^2 + 4*this.parameter.D*this.parameter.omega*time_step + 4)) - data_pre_last.x * ((this.parameter.omega^2*time_step^2 - 4*this.parameter.D*this.parameter.omega*time_step + 4)/(this.parameter.omega^2*time_step^2 + 4*this.parameter.D*this.parameter.omega*time_step + 4));
     }
     if (isFinite(data_current.x) == false) {
       data_current.x = 0;
@@ -703,8 +699,7 @@ class ControlLoopElementMeasurement {
       data_current.x_m = data_current.x * this.parameter.K;
     }
     else if (this.type == 'PT1') {
-      data_current.x_m = data_last.x_m + (this.parameter.K * data_current.x - data_last.x_m) * 
-        (time_step / (this.parameter.T + time_step));
+      data_current.x_m = data_current.x * ((this.parameter.K*time_step)/(2*this.parameter.T + time_step)) + data_last.x * ((this.parameter.K*time_step)/(2*this.parameter.T + time_step)) - data_last.x_m * (-(2*this.parameter.T - time_step)/(2*this.parameter.T + time_step));
     }
     if (isFinite(data_current.x_m) == false) {
       data_current.x_m = 0;

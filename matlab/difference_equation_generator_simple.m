@@ -2,7 +2,7 @@ clear; clc; close all
 % Create symbolic variables.
 syms K T s
 % Define the transfer function for a PT1-element.
-G_s = 1 / (T * s);
+G_s = K / (T * s + 1);
 % Create further symbolic variables needed for the z transform.
 syms z timestep
 % z transform (backwards / forwards / tustin).

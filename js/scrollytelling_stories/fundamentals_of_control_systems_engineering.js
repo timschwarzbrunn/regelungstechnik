@@ -2,30 +2,35 @@
     title: 'Was ist Regelungstechnik?',
     content: [
         {
-            section_html_text: 'in Arbeit...',
-            control_loop_behaviour: {}
-        },
-        {
-            section_html_text: 'Das zu regelende System wird allgemein <b>Regelstrecke</b> genannt.<br><br>Regelstrecken können verschiedener Art sein. Es kann sich um einen Elektromotor handeln, um ein mechanisches System oder aber',
+            section_html_text: 'Regelunstechnik ist eine Ingenieurswissenschaft, welche sich mit der Modellierung dynamischer Systeme (<b>Regelstrecke</b>) befasst, ...',
             control_loop_behaviour: {
                 marked: ['#controlled_system']
             }
         },
         {
-            section_html_text: 'Die <b>Regelstrecke</b> besitzt am Eingang ein Stellglied, worüber das Ausgangsverhalten des Systems beeinflusst werden kann.',
+            section_html_text: '... und mit dem Entwurf von <b>Reglern</b>, welche das System veranlassen, sich wie gewünscht zu verhalten.',
             control_loop_behaviour: {
-                marked: ['#controlled_system', '#line_controller_to_system', '#line_system_to_output']
+                marked: ['#controller']
             }
         },
         {
-            section_html_text: 'Das Ziel der Regelung ist es, durch geeignete Beeinflussung des Systems, dessen Verhalten wie gewünscht zu kontrollieren.',
+            section_html_text: 'Den gewünschten Wert (<b>Führungsgröße</b>), welchen der Ausgang des Systems (<b>Regelgröße</b>) annehmen soll, wird vom Anwender vorgegeben. Es steht der Einheitssprung, der Impuls und ein Sinussignal zur Auswahl.',
             control_loop_behaviour: {
-                marked: ['#controlled_system']
+                marked: ['#input_variable']
+            }
+        },
+        {
+            section_html_text: 'Damit der Regler Informationen darüber erhält, welcher Ausgangswert des Systems (<b>Regelgröße</b>) momentan vorliegt, wird dieser gemessen und dem Regler zurückgeführt.',
+            control_loop_behaviour: {
+                marked: ['#measuring_element', '#path_to_measurement', '#path_from_measurement']
             }
         },
     ],
     videos: [
         'https://www.youtube.com/embed/l26IGS2RlM0',
-        'https://www.youtube.com/embed/1L07JzTJITw'
+        'https://www.youtube.com/embed/1L07JzTJITw',
+        'https://www.youtube.com/embed/OQ__2dGeMUQ',
+        'https://www.youtube.com/embed/vcOG0wUvO5I',
+        'https://www.youtube.com/embed/lCZv_-drMqE'
     ]
 }

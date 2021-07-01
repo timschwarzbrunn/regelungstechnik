@@ -125,7 +125,7 @@ function update_scrollytelling(scrollytelling_content) {
             exit: function(direction) {
                 control_loop_transformation('#main_control_loop', content.control_loop_behaviour, 'exit');
                 // Hide it.
-                this.element.style.opacity = 0;
+                this.element.style.opacity = 0.3;
             },
             enabled: false
         });

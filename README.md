@@ -1,7 +1,7 @@
 # regelungstechnik
 Educational tool developed as part of the bachelor thesis "Learning Control Systems Engineering with Interactive Visualization".
 
-[🔗 startbit96.github.io/regelungstechnik/](https://startbit96.github.io/regelungstechnik/)
+[🔗 timschwarzbrunn.github.io/regelungstechnik/](https://timschwarzbrunn.github.io/regelungstechnik/)
 
 
 # How to contribute to the project.
